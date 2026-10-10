@@ -1,0 +1,128 @@
+{{Infobox settlement
+|settlement_type=Town
+|[[Census 2011]] Location Code=626924
+|native_name=Nuvem (CT)
+|subdivision_name3=SALCETE 002
+|subdivision_name2=SOUTH GOA
+|subdivision_name1=GOA
+|Division=
+|subdivision_type2=[[SOUTH GOA]]
+|subdivision_type3=[[SALCETE 002]]
+|Nearest city=[[BELGAUM]]
+|| latd =  xx | latm =  xx  | lats =  xx  | latNS = N=
+|| longd = xx | longm = xx | longs = xx | longEW = E=
+|pushpin_label_position=right
+|Area=11
+|elevation_m=
+|population_total=9288
+|population_as_of=2011
+|population_density=844
+|population_blank1=4450
+|population_blank2=4838
+|female_per_1000_male=1087
+|native_name_lang=[[Konkani, Marathi]]
+}}
+
+== Nuvem (CT) (626924) ==
+
+Nuvem (CT) is a town in the [[SALCETE 002]] taluka of [[SOUTH GOA]] district with an area of 11 sq. km. and harbouring 2248 households with total population of 9288 as per the 2011 Census. The district headquarter [[MARGAO]] is at a distance of 5 km. The state headquarter [[PANAJI]] is at a distance of 28 km. Male population is 4450 and female population is 4838. Scheduled Caste population is 45 and Scheduled Tribes population is 3634. Census Location Code of the town is 626924<ref>http://www.censusindia.gov.in/2011census/dchb/DCHB.html</ref>.
+
+Population wise class of the town is Class V (population_total 5,000 to 9,999).
+The civic status of the town is 'Census Town'.
+
+The nearest city with population more than 1 lakh is BELGAUM at a distance of 188 km. The nearest city with population more than 5 lakh is PUNE at a distance of 506 km. Railway station is at MARGAO at a distance of 4 km.
+
+
+== Weather ==  
+* Rainfall (mm.): 3150.53 
+* Maximum Temperature (in centigrade): 31.33
+* Minimum Temperature (in centigrade): 24.17
+
+
+== Literacy ==  
+* Total literate population: 7224
+* Literate male population: 3616 (81.26%)
+* Literate female population: 3608 (74.58%)
+
+
+== Sanitation and Drinking Water ==  
+The town has open drainage system.
+Water is supplied from a service reservoir. The town gets it water as tap water from a treated source. The capacity of the water supply system is 1100 kilo-litres.
+
+The nearest fire fighting service is at MARGAO (4 km) .
+
+
+== Health Services ==
+The nearest Allopathic hospital facility is at 4 km .
+The nearest Alternative Medicine hospital is at 18 km .
+There is 1 Dispensary / Health Centre in the town.
+There is 1 Family Welfare Centre in the town.
+There is 1 Maternity and Child Welfare Centre in the town.
+The nearest Maternity Home is at 19 km .
+The nearest T.B. clinic is at 4 km .
+The nearest Nursing Home is at 0 km .
+The nearest Veterinary hospital is at 4 km .
+The nearest Mobile health clinic is at 0 km .
+The nearest Other medical amenities is at 26 km .
+
+
+
+There are 4 Non-Government medicine shops in the town.
+
+
+== Educational Facilities ==
+There is 1 government [[Primary School]] in the town. There are 2 private [[Primary School]]s in the town. 
+ There are 2 private Middle Schools in the town.  
+ There are 2 private [[Secondary School]]s in the town.  
+ There is 1 private [[Senior Secondary School]] in the town.  
+   
+   
+  The nearest private Degree College of Commerce only is at MARGAO (4 km) .
+  The nearest private Degree College of Arts and Science is at MARGAO (4 km) .
+  The nearest private Degree College of Arts and Commerce is at NAVELIM CT (6 km) .
+ There is 1 private Degree College of Arts, Science and Commerce in the town.  
+  The nearest private Degree College - Law is at MARGAO (4 km) .
+  The nearest government Degree College - University is at PANAJI (25 km) .
+  The nearest private Degree College - Others is at NAVELIM (6 km) .
+  The nearest government Medical College is at BAMBOLIM CT (28 km) .
+  The nearest private Engineering College is at VERNA CT (1 km) .
+  The nearest private Management Institute is at VERNA CT (1 km) .
+  The nearest private Polytechnic is at VERNA CT (1 km) .
+  The nearest private Vocational Training School is at MARGAO (4 km) .
+  The nearest private Non-formal Training Centre is at MARGAO (4 km) .
+  The nearest private Special School for Disabled is at MARGAO (4 km) .
+   
+
+
+== Facilities ==
+  The nearest government Orphanage Home is at MARGAO (4 km) .
+  The nearest government Working Women's Hostel is at PENHA DE FRANCA CT (37 km) .
+  The nearest government Old Age Home is at MARGAO (5 km) .
+  The nearest government stadium is at MARGAO (4 km) .
+  The nearest private Cinema Theatre is at MARGAO (4 km) .
+ There is 1 private Auditorium / Community Hall in the town.  
+ There is 1 private Public Library in the town.  
+
+
+== Manufacturing ==
+Nuvem (CT) is engaged in the manufacturing of following items (in decreasing order of importance): RICE PRODUCTS,COCONUT PRODUCTS,COUNTRY LIQUOR
+
+
+== Market and Banking ==
+There is 1 Nationalised Bank in the town.
+
+There is 1 [[Co-operative Bank]] in the town.
+
+
+
+
+
+[[Categories:[[SOUTH GOA]]]]
+[[Categories:[[SALCETE 002]]]]
+[[Categories:[[SOUTH GOA district towns]]]]
+
+
+== References ==
+{{Reflist}}
+
+

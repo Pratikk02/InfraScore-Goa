@@ -1,0 +1,62 @@
+facility,town,census_code,probability,population
+Auditorium / community hall,Cuncolim,803250,0.81,16623
+Auditorium / community hall,Quepem,803251,0.809,14795
+Auditorium / community hall,Priol,626868,0.737,8164
+Auditorium / community hall,Marcaim,626867,0.659,6215
+Auditorium / community hall,Onda,626842,0.609,5863
+Auditorium / community hall,Calangute,626695,0.586,13810
+Auditorium / community hall,Calapor,626732,0.583,14077
+Auditorium / community hall,Sanguem,803253,0.556,6444
+Auditorium / community hall,Chimbel,626730,0.551,15289
+Auditorium / community hall,Socorro,626703,0.546,12908
+Auditorium / community hall,Sancoale,626886,0.52,21923
+Auditorium / community hall,Anjuna,626694,0.51,9636
+Auditorium / community hall,Cortalim,626887,0.509,9080
+Auditorium / community hall,Bambolim,626733,0.507,6885
+Auditorium / community hall,Siolim,626690,0.506,10936
+Co-operative bank,Socorro,626703,0.952,12908
+Co-operative bank,Davorlim,626928,0.63,15350
+Co-operative bank,Sao Jose de Areal,626927,0.595,10229
+Co-operative bank,Candolim,626697,0.512,8500
+Degree college,Curchorem-Cacora,803252,0.845,22730
+Degree college,Sancoale,626886,0.773,21923
+Degree college,Bicholim,803244,0.762,16986
+Degree college,Sanquelim,803245,0.736,13651
+Degree college,Valpoi,803246,0.688,8532
+Degree college,Cortalim,626887,0.627,9080
+Degree college,Priol,626868,0.611,8164
+Degree college,Chicalim,626885,0.549,6933
+Degree college,Verna,626923,0.535,6632
+Degree college,Curtorim,626926,0.533,12886
+Degree college,Sanguem,803253,0.53,6444
+Degree college,Raia,626925,0.53,10706
+Degree college,Davorlim,626928,0.511,15350
+Degree college,Chimbel,626730,0.509,15289
+Private bank,Curtorim,626926,0.691,12886
+Private bank,Benaulim,626931,0.664,11919
+Private bank,Jua,626727,0.642,4134
+Private bank,Murda,626731,0.577,7517
+Private bank,Sao Jose de Areal,626927,0.548,10229
+Private bank,Saligao,626696,0.524,6280
+Private bank,Onda,626842,0.518,5863
+Public library,Cuncolim,803250,0.94,16623
+Public library,Bambolim,626733,0.736,6885
+Public library,Usgao,626873,0.682,12436
+Public library,Socorro,626703,0.633,12908
+Public library,Marcaim,626867,0.626,6215
+Public library,Carapur,626763,0.626,5500
+Public library,Raia,626925,0.604,10706
+Public library,Navelim,626930,0.571,12323
+Public library,Davorlim,626928,0.563,15350
+Public library,Sanvordem,627021,0.544,5103
+Stadium,Ponda,803247,0.901,22664
+Stadium,Cuncolim,803250,0.874,16623
+Stadium,Bicholim,803244,0.857,16986
+Stadium,Siolim,626690,0.765,10936
+Stadium,Sancoale,626886,0.728,21923
+Stadium,Curtorim,626926,0.676,12886
+Stadium,Chimbel,626730,0.671,15289
+Stadium,Curti,626870,0.623,16385
+Stadium,Quepem,803251,0.572,14795
+Stadium,Murda,626731,0.521,7517
+Stadium,Benaulim,626931,0.521,11919

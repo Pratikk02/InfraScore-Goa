@@ -1,0 +1,5 @@
+features,n_features,MAE,R2
+Demand,3,7.6705,0.0338
+Demand + Social,6,7.8724,-0.0087
+Demand + Social + Administrative,8,7.3677,0.0999
+Demand + Social + Administrative + Geography,10,6.796,0.2389

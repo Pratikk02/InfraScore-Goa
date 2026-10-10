@@ -1,0 +1,11 @@
+feature,coef_per_SD
+is_statutory_town,3.8889
+rainfall_mm,-2.4861
+log_density,2.3386
+log_population,0.8611
+sex_ratio,-0.7521
+avg_household_size,-0.0
+st_share,-0.0
+sc_share,0.0
+is_south_goa,0.0
+log_area,-0.0

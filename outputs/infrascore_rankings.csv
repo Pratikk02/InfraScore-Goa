@@ -1,0 +1,70 @@
+census_code,town,civic_status,taluka,district,population,health,education,utilities,connectivity,finance,social,infrascore,rank,tier,rank_median,rank_p05,rank_p95,cluster_id,cluster
+803243,Panaji,Municipal Corporation,Tiswadi,North Goa,70991,74.86,59.66,64.77,74.1,94.91,100.0,74.21,1,A Leading,1.0,1.0,2.0,3,C1 Urban hubs
+803249,Margao,Municipal Council,Salcete,South Goa,87650,65.37,50.67,86.45,67.9,43.51,87.18,67.02,2,A Leading,2.0,1.0,7.0,3,C1 Urban hubs
+803242,Mapusa,Municipal Council,Bardez,North Goa,39989,67.95,48.43,59.64,33.63,83.34,86.83,60.66,3,A Leading,4.0,2.0,11.0,3,C1 Urban hubs
+626929,Aquem,Census Town,Salcete,South Goa,6511,68.23,62.02,56.82,50.3,49.67,65.0,59.84,4,A Leading,6.0,3.0,11.0,3,C1 Urban hubs
+803241,Pernem,Municipal Council,Pernem,North Goa,5021,47.05,56.45,72.48,30.96,100.0,64.65,58.66,5,A Leading,5.0,2.0,14.0,1,C2 Taluka centres
+626885,Chicalim,Census Town,Mormugao,South Goa,6933,81.76,57.11,55.3,36.24,33.37,57.84,57.48,6,A Leading,10.0,3.0,18.0,3,C1 Urban hubs
+803254,Canacona,Municipal Council,Canacona,South Goa,12434,41.32,54.97,76.68,34.19,79.88,60.77,55.85,7,A Leading,7.0,3.0,25.0,1,C2 Taluka centres
+626923,Verna,Census Town,Salcete,South Goa,6632,61.86,63.04,45.6,48.94,47.21,62.45,55.5,8,A Leading,8.0,4.0,15.0,3,C1 Urban hubs
+803247,Ponda,Municipal Council,Ponda,North Goa,22664,78.22,49.5,40.71,10.4,96.89,57.57,54.6,9,A Leading,13.0,3.0,43.0,1,C2 Taluka centres
+803244,Bicholim,Municipal Council,Bicholim,North Goa,16986,61.65,44.52,60.23,18.3,75.84,66.08,53.3,10,A Leading,11.0,6.0,27.0,1,C2 Taluka centres
+626701,Penha-de-Franca,Census Town,Bardez,North Goa,15342,31.5,49.02,57.08,52.91,51.92,86.22,50.84,11,A Leading,8.0,3.0,20.0,3,C1 Urban hubs
+626930,Navelim,Census Town,Salcete,South Goa,12323,47.5,62.41,46.82,50.3,21.18,70.63,50.45,12,A Leading,12.0,6.0,22.0,3,C1 Urban hubs
+803248,Mormugao,Municipal Council,Mormugao,South Goa,94393,52.71,44.7,54.88,37.41,34.55,82.39,50.4,13,A Leading,10.0,4.0,19.0,3,C1 Urban hubs
+803252,Curchorem-Cacora,Municipal Council,Quepem,South Goa,22730,46.92,52.17,50.0,37.16,40.28,63.78,48.14,14,A Leading,14.0,7.0,25.0,3,C1 Urban hubs
+626733,Bambolim,Census Town,Tiswadi,North Goa,6885,75.01,42.36,22.3,43.32,46.15,52.04,48.0,15,B Good,21.0,7.0,46.0,3,C1 Urban hubs
+626699,Reis Magos,Census Town,Bardez,North Goa,8053,41.78,52.03,45.05,43.32,48.15,46.94,45.87,16,B Good,18.0,10.0,36.0,1,C2 Taluka centres
+626931,Benaulim,Census Town,Salcete,South Goa,11919,36.01,42.24,70.22,41.18,18.09,60.97,45.58,17,B Good,21.0,12.0,38.0,0,C3 Peri-urban
+626696,Saligao,Census Town,Bardez,North Goa,6280,40.36,40.47,70.22,35.62,13.47,62.74,45.19,18,B Good,23.0,11.0,41.0,0,C3 Peri-urban
+803246,Valpoi,Municipal Council,Satari,North Goa,8532,45.8,53.48,37.29,1.31,64.98,80.35,44.33,19,B Good,26.0,9.0,66.0,1,C2 Taluka centres
+803253,Sanguem,Municipal Council,Sanguem,South Goa,6444,38.87,39.16,55.31,20.21,91.52,34.86,44.28,20,B Good,25.0,9.0,51.0,1,C2 Taluka centres
+803245,Sanquelim,Municipal Council,Bicholim,North Goa,13651,48.38,49.4,43.94,8.38,55.14,63.02,43.84,21,B Good,23.0,14.0,51.0,1,C2 Taluka centres
+626734,Goa Velha,Census Town,Tiswadi,North Goa,4322,38.31,76.4,24.42,33.83,50.0,38.42,43.66,22,B Good,27.0,8.0,54.0,1,C2 Taluka centres
+626700,Pilerne,Census Town,Bardez,North Goa,5827,52.82,30.79,70.22,30.61,14.6,40.6,43.52,23,B Good,36.0,16.0,58.0,0,C3 Peri-urban
+626871,Quela,Census Town,Ponda,North Goa,6852,34.46,59.58,58.2,5.45,41.94,58.45,43.03,24,B Good,26.0,13.0,57.0,1,C2 Taluka centres
+626924,Nuvem,Census Town,Salcete,South Goa,9288,40.91,61.07,28.17,44.59,8.74,72.54,42.89,25,B Good,23.0,10.0,51.0,3,C1 Urban hubs
+626704,Aldona,Census Town,Bardez,North Goa,6270,42.02,51.73,40.36,16.01,60.54,52.55,42.63,26,B Good,27.0,14.0,44.0,1,C2 Taluka centres
+626693,Guirim,Census Town,Bardez,North Goa,5036,40.55,50.17,46.49,35.32,7.97,63.99,41.97,27,B Good,26.0,16.0,51.0,0,C3 Peri-urban
+626732,Calapor,Census Town,Tiswadi,North Goa,14077,47.97,30.35,44.5,47.87,12.61,65.61,41.96,28,B Good,25.0,13.0,49.0,0,C3 Peri-urban
+626869,Bandora,Census Town,Ponda,North Goa,12722,34.63,59.63,52.2,7.83,31.66,62.8,41.64,29,C Moderate,29.0,14.0,55.0,1,C2 Taluka centres
+626731,Murda,Census Town,Tiswadi,North Goa,7517,41.24,32.14,39.01,64.37,11.07,62.61,41.56,30,C Moderate,27.0,9.0,52.0,0,C3 Peri-urban
+626730,Chimbel,Census Town,Tiswadi,North Goa,15289,49.75,34.61,36.52,51.57,1.88,64.88,41.08,31,C Moderate,32.0,12.0,63.0,0,C3 Peri-urban
+626729,Corlim,Census Town,Tiswadi,North Goa,6568,53.43,33.55,28.08,39.57,31.4,61.34,40.89,32,C Moderate,27.0,16.0,47.0,0,C3 Peri-urban
+626926,Curtorim,Census Town,Salcete,South Goa,12886,43.12,41.82,43.19,30.41,17.44,64.15,40.5,33,C Moderate,29.0,21.0,40.0,0,C3 Peri-urban
+626697,Candolim,Census Town,Bardez,North Goa,8500,51.43,24.83,44.21,23.77,33.59,63.88,39.98,34,C Moderate,29.0,18.0,50.0,0,C3 Peri-urban
+626691,Colvale,Census Town,Bardez,North Goa,4818,49.27,47.19,37.93,24.0,19.99,48.51,39.79,35,C Moderate,37.0,25.0,47.0,2,C4 Lagging
+626925,Raia,Census Town,Salcete,South Goa,10706,38.98,38.96,46.34,34.61,11.71,65.05,39.67,36,C Moderate,29.0,20.0,48.0,0,C3 Peri-urban
+626928,Davorlim,Census Town,Salcete,South Goa,15350,35.3,36.85,45.12,50.3,0.0,65.14,39.28,37,C Moderate,34.0,15.0,66.0,0,C3 Peri-urban
+626887,Cortalim,Census Town,Mormugao,South Goa,9080,48.6,38.45,34.34,27.93,31.37,39.42,37.98,38,C Moderate,38.0,25.0,52.0,2,C4 Lagging
+626690,Siolim,Census Town,Bardez,North Goa,10936,48.1,44.3,31.33,14.82,30.05,51.88,37.57,39,C Moderate,42.0,27.0,53.0,2,C4 Lagging
+626695,Calangute,Census Town,Bardez,North Goa,13810,50.32,34.36,33.71,19.55,28.72,53.9,37.39,40,C Moderate,40.0,27.0,49.0,2,C4 Lagging
+626933,Chinchinim,Census Town,Salcete,South Goa,6908,37.48,37.76,42.42,27.6,25.4,48.33,36.92,41,C Moderate,37.0,26.0,49.0,2,C4 Lagging
+626868,Priol,Census Town,Ponda,North Goa,8164,27.4,52.13,40.06,16.46,49.96,39.22,36.67,42,D Lagging,43.0,22.0,58.0,1,C2 Taluka centres
+626932,Varca,Census Town,Salcete,South Goa,5439,33.1,36.76,49.56,33.72,24.14,35.59,36.57,43,D Lagging,41.0,25.0,60.0,2,C4 Lagging
+626702,Salvador do Mundo,Census Town,Bardez,North Goa,6373,34.64,26.15,30.65,40.54,27.62,73.37,36.2,44,D Lagging,34.0,18.0,58.0,0,C3 Peri-urban
+626692,Moira,Census Town,Bardez,North Goa,4299,37.6,30.77,44.31,23.1,20.19,60.25,35.93,45,D Lagging,39.0,30.0,51.0,0,C3 Peri-urban
+626870,Curti,Census Town,Ponda,North Goa,16385,38.47,35.37,47.29,3.72,25.57,62.57,35.52,46,D Lagging,47.0,25.0,64.0,2,C4 Lagging
+626872,Borim,Census Town,Ponda,North Goa,8257,30.48,51.1,41.9,6.0,23.52,57.93,35.27,47,D Lagging,48.0,29.0,62.0,2,C4 Lagging
+627021,Sanvordem,Census Town,Sanguem,South Goa,5103,26.26,40.61,40.46,36.78,29.78,37.89,35.06,48,D Lagging,42.0,19.0,58.0,2,C4 Lagging
+626727,Jua,Census Town,Tiswadi,North Goa,4134,36.78,50.42,31.87,17.43,32.11,31.34,34.61,49,D Lagging,47.0,26.95,59.0,2,C4 Lagging
+626703,Socorro,Census Town,Bardez,North Goa,12908,47.34,24.14,27.17,38.09,16.62,51.37,34.61,50,D Lagging,48.0,28.95,63.0,0,C3 Peri-urban
+626694,Anjuna,Census Town,Bardez,North Goa,9636,39.24,25.75,55.02,12.37,28.45,32.45,33.91,51,D Lagging,52.0,31.0,66.0,2,C4 Lagging
+626659,Mandrem,Census Town,Pernem,North Goa,8336,46.74,34.83,30.1,10.68,22.07,51.24,33.6,52,D Lagging,51.0,35.0,59.0,2,C4 Lagging
+626873,Usgao,Census Town,Ponda,North Goa,12436,28.99,34.25,33.3,2.76,49.59,49.84,31.12,53,D Lagging,55.0,30.0,66.0,2,C4 Lagging
+626728,Cumbarjua,Census Town,Tiswadi,North Goa,4917,45.48,26.7,30.35,19.06,8.2,44.69,30.93,54,D Lagging,55.0,44.0,65.0,2,C4 Lagging
+803251,Quepem,Municipal Council,Quepem,South Goa,14795,30.3,38.85,17.98,22.69,35.67,47.37,30.65,55,D Lagging,51.0,33.0,60.0,2,C4 Lagging
+626927,Sao Jose de Areal,Census Town,Salcete,South Goa,10229,24.91,37.09,21.07,37.5,3.36,66.3,30.45,56,E Critical,54.0,29.0,67.0,0,C3 Peri-urban
+626735,Mercurim,Census Town,Tiswadi,North Goa,4970,30.71,41.28,16.48,24.92,17.31,56.47,30.35,57,E Critical,51.0,38.0,62.0,2,C4 Lagging
+626698,Nerul,Census Town,Bardez,North Goa,5042,34.13,34.71,23.38,35.47,7.96,34.68,29.74,58,E Critical,58.0,41.0,66.0,2,C4 Lagging
+803250,Cuncolim,Municipal Council,Salcete,South Goa,16623,38.92,48.65,6.59,24.61,27.04,24.5,29.62,59,E Critical,59.0,36.0,68.0,2,C4 Lagging
+626886,Sancoale,Census Town,Mormugao,South Goa,21923,31.49,34.83,14.98,28.75,12.34,48.77,28.26,60,E Critical,58.0,40.0,67.0,2,C4 Lagging
+626661,Morjim,Census Town,Pernem,North Goa,6760,35.64,26.02,18.6,10.98,20.7,64.1,27.96,61,E Critical,57.0,37.0,67.0,2,C4 Lagging
+626763,Carapur,Census Town,Bicholim,North Goa,5500,24.44,33.59,48.88,12.05,10.17,22.15,27.64,62,E Critical,64.0,51.0,69.0,2,C4 Lagging
+626660,Parcem,Census Town,Pernem,North Goa,4627,32.31,44.04,13.55,14.09,8.78,38.12,26.4,63,E Critical,63.0,54.0,68.0,2,C4 Lagging
+626658,Arambol,Census Town,Pernem,North Goa,5322,35.75,33.58,15.19,7.95,16.09,47.01,26.19,64,E Critical,63.0,49.0,68.0,2,C4 Lagging
+626969,Xeldem,Census Town,Quepem,South Goa,7434,10.25,44.58,25.22,24.01,7.52,46.51,25.53,65,E Critical,61.0,46.95,69.0,2,C4 Lagging
+626842,Onda,Census Town,Satari,North Goa,5863,13.76,40.3,22.16,4.02,50.93,35.15,25.14,66,E Critical,64.0,34.0,68.0,2,C4 Lagging
+626764,Pale,Census Town,Bicholim,North Goa,6043,9.2,39.38,27.8,3.29,32.55,44.61,23.95,67,E Critical,65.0,46.0,69.0,2,C4 Lagging
+626865,Candola,Census Town,Ponda,North Goa,5354,18.7,26.1,28.64,19.06,20.89,28.67,23.44,68,E Critical,64.0,54.0,68.0,2,C4 Lagging
+626867,Marcaim,Census Town,Ponda,North Goa,6215,28.89,42.88,8.16,12.39,24.25,16.05,23.32,69,E Critical,68.0,57.0,69.0,2,C4 Lagging

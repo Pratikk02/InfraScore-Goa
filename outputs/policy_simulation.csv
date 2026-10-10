@@ -1,0 +1,13 @@
+budget_K,strategy,pop_weighted_gain,mean_gain,towns_left_tier_E,gini_after,gain_in_bottom_quintile
+5,Greedy optimiser,0.439,0.3083,2.0,0.1434,12.2293
+5,Largest towns first,0.0254,0.0035,0.0,0.1469,0.0
+5,Lowest score first,0.1772,0.3765,0.0,0.1375,25.9776
+5,Random (mean),0.0879,0.1268,0.4,0.1457,3.4418
+10,Greedy optimiser,0.7621,0.6034,2.0,0.1415,15.7682
+10,Largest towns first,0.0508,0.007,0.0,0.147,0.0
+10,Lowest score first,0.396,0.7351,5.0,0.1295,50.7212
+10,Random (mean),0.1773,0.2666,0.7333,0.1451,5.539
+20,Greedy optimiser,1.298,1.2185,3.0,0.1391,26.2131
+20,Largest towns first,0.1015,0.0141,0.0,0.147,0.0
+20,Lowest score first,0.7981,1.379,14.0,0.1162,91.2093
+20,Random (mean),0.3676,0.5386,1.6667,0.1437,10.6575
