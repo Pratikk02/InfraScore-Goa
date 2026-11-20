@@ -1,0 +1,39 @@
+name: Reproduce results
+
+# Re-runs the full analysis on a clean GitHub-hosted machine and checks the
+# headline numbers reported in the paper (23B-V2) against tolerances.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-lock.txt
+      - name: Execute the notebook from scratch
+        env:
+          MPLBACKEND: Agg
+        run: |
+          rm -rf outputs
+          jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=1800 \
+            --output executed.ipynb InfraScore_Goa_Final.ipynb
+      - name: Check headline numbers against the paper
+        run: python check_results.py
+      - name: Upload regenerated outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: infrascore-outputs
+          path: |
+            outputs/
+            executed.ipynb

@@ -1,0 +1,5 @@
+,n_facilities,spent_cr,pop_weighted_gain,mean_gain,towns_left_tier_E,gini_after,gain_in_bottom_quintile
+Cost-aware greedy,5.0,236.7271,0.5108,0.58,4.0,0.1403,21.2182
+Greedy (ignores cost),4.0,224.0861,0.5144,0.5038,3.0,0.1421,18.6696
+Lowest score first,4.0,241.9489,0.2854,0.5657,1.0,0.1376,20.6472
+Random (mean of 30),5.2333,235.977,0.2266,0.3581,1.2667,0.144,7.9958

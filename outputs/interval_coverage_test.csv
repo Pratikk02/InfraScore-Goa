@@ -1,0 +1,19 @@
+scheme,rule,nominal,empirical,min_run,max_run,half_width,cov_statutory,cov_census_town
+random 5-fold x10,plain (V1),0.8,0.8203,0.7826,0.8551,10.9569,0.6929,0.8527
+random 5-fold x10,plain (V1),0.9,0.8957,0.8551,0.913,14.8729,0.7714,0.9273
+random 5-fold x10,plain (V1),0.95,0.9406,0.913,0.971,18.9002,0.8571,0.9618
+random 5-fold x10,conformal,0.8,0.8449,0.7971,0.8696,11.7849,0.7071,0.88
+random 5-fold x10,conformal,0.9,0.9406,0.913,0.971,18.5105,0.8571,0.9618
+random 5-fold x10,conformal,0.95,0.987,0.9565,1.0,25.7701,0.9571,0.9945
+random 5-fold x10,Mondrian,0.8,0.8667,0.8261,0.8986,13.5417,0.9143,0.8545
+random 5-fold x10,Mondrian,0.9,0.9319,0.8986,0.9565,17.9481,0.9143,0.9364
+random 5-fold x10,Mondrian,0.95,0.9652,0.9275,0.9855,22.3942,0.9143,0.9782
+leave-one-taluka-out,plain (V1),0.8,0.7536,0.7536,0.7536,11.2059,0.5714,0.8
+leave-one-taluka-out,plain (V1),0.9,0.8551,0.8551,0.8551,15.1962,0.7143,0.8909
+leave-one-taluka-out,plain (V1),0.95,0.942,0.942,0.942,17.7287,0.8571,0.9636
+leave-one-taluka-out,conformal,0.8,0.7971,0.7971,0.7971,11.9522,0.6429,0.8364
+leave-one-taluka-out,conformal,0.9,0.942,0.942,0.942,17.0918,0.8571,0.9636
+leave-one-taluka-out,conformal,0.95,0.9855,0.9855,0.9855,24.5697,0.9286,1.0
+leave-one-taluka-out,Mondrian,0.8,0.8406,0.8406,0.8406,13.8368,0.9286,0.8182
+leave-one-taluka-out,Mondrian,0.9,0.9275,0.9275,0.9275,17.8135,0.9286,0.9273
+leave-one-taluka-out,Mondrian,0.95,0.9855,0.9855,0.9855,22.9133,0.9286,1.0

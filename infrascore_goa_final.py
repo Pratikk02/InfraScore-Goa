@@ -5,7 +5,7 @@
 # 
 # **Advanced Machine Learning for Business Transformation (AMLBT) | Goa Institute of Management, PGDM Big Data Analytics**
 # 
-# **Team:** Mallika Gupta (B2026086), Pratik Kelkar (B2026090), Kshitij Mahajan (B2026081)  
+# **Team 23B:** Mallika Gupta (B2026086), Pratik Kelkar (B2026090), Kshitij Satish Mahajan (B2026081)  
 # **Faculty:** Dr. Suman Sanyal
 # 
 # ---
@@ -24,15 +24,16 @@
 # | 8 | Facility presence model: classification of 6 facility types | Candidate sites |
 # | 9 | Policy simulation: equal-cost and cost-aware allocation, 200 cost scenarios | Investment plan |
 # | 10 | External validation, post-2011 corroboration, state context | Validity checks |
+# | 11 | Second review: coverage audit, town map, contemporary access, interval-coverage test, spatial spillovers, sourced costs | V2 robustness checks |
 # 
-# **Run:** `Kernel > Restart & Run All`. Runtime is about 4 minutes on a single CPU core (less on a multi-core laptop). All random processes use `SEED = 42`.
+# **Run:** `Kernel > Restart & Run All`. Runtime is about 3-4 minutes on a single CPU core. All random processes use `SEED = 42`.
 
 # ## 0. Setup
 
 # In[1]:
 
 
-import io, re, sys, time, zipfile, platform, warnings
+import io, re, sys, json, time, zipfile, platform, warnings
 from pathlib import Path
 
 import numpy as np
@@ -83,7 +84,7 @@ plt.rcParams.update({
     "legend.fontsize": 7, "legend.frameon": False, "axes.spines.top": False, "axes.spines.right": False,
     "axes.edgecolor": "#666666", "axes.linewidth": 0.7, "axes.grid": True, "grid.color": "#e6e6e6",
     "grid.linewidth": 0.6, "axes.axisbelow": True, "xtick.color": "#444444", "ytick.color": "#444444",
-    "figure.dpi": 150, "savefig.dpi": 300})
+    "figure.dpi": 150, "savefig.dpi": 300, "pdf.fonttype": 42, "ps.fonttype": 42})
 COL1, COL2 = 3.5, 7.2                     # IEEE single- and double-column widths (inches)
 NORTH, SOUTH, GREY = "#1f6f8b", "#e07a5f", "#b8bec6"
 CLUSTER_COLORS = ["#2a9d8f", "#e9c46a", "#f4a261", "#c8553d"]
@@ -1254,9 +1255,540 @@ print(f"Exact evidence: plan towns {plan_hits}/{len(towns_plan)} vs eligible con
 CONTROL.to_csv(OUT / "post2011_controls.csv", index=False)
 
 
-# ## 11. Export results
+# ## 11. Second-review extensions
+# 
+# The first review asked for: (1) a precise account of analytical coverage, a town-level map and contemporary spatial proxies; (2) a clear separation of the ten-intervention experiment from the cost-budget experiment, with post-2011 records treated as limited corroboration; (3) realistic capital and operating costs, a test of interval coverage, and spatial spillovers. Sections 11a-11d implement these checks. Every number quoted in the V2 report is printed by the summary cell at the end.
+# 
+# ### 11a. Analytical coverage and the missing Orgao record
 
 # In[21]:
+
+
+OFFICIAL = {"Towns": 70, "Statutory towns": 14, "Census towns": 56, "Urban population": 906_814}  # Census 2011 (DPSE, Goa at a Glance)
+COORDS = pd.read_csv(RAW / "spatial" / "town_coordinates.csv")
+orgao = COORDS[COORDS.town.str.startswith("Orgao")].iloc[0]
+analysed = {"Towns": len(F), "Statutory towns": int((F.civic_status != "Census Town").sum()),
+            "Census towns": int((F.civic_status == "Census Town").sum()), "Urban population": int(F.population.sum())}
+COVERAGE = pd.DataFrame({"official (Census 2011)": OFFICIAL, "analysed": analysed})
+COVERAGE["share analysed"] = (COVERAGE["analysed"] / COVERAGE["official (Census 2011)"]).round(4)
+MISSING_POP = OFFICIAL["Urban population"] - analysed["Urban population"]
+print(f"Absent record: Orgao (census town, Ponda taluka). GeoNames population {int(orgao.geonames_pop):,}; "
+      f"official urban population minus analysed towns = {MISSING_POP:,}")
+display(COVERAGE)
+
+
+def scores_without(drop_idx):
+    """Re-estimate scaling bounds and scores with one town removed."""
+    Fk = F.drop(index=drop_idx)
+    s = aggregate(pillar_table(score_indicators(Fk, fit_bounds(Fk))), BASE_W)
+    return pd.Series(s.values, index=Fk.index)
+
+
+base_rank = pd.Series(IS0, index=F.index).rank(ascending=False)
+jk = []
+for i in F.index:
+    s = scores_without(i).rank(ascending=False)
+    ref = base_rank.drop(index=i).rank()
+    jk.append({"dropped": F.town[i], "population": F.population[i],
+               "max_rank_shift": float((s - ref).abs().max()), "spearman": spearmanr(s, ref).statistic})
+JACK = pd.DataFrame(jk)
+SMALL = JACK[JACK.population < 10_000]
+print(f"Leave-one-town-out (69 runs): worst rank shift of any remaining town = {JACK.max_rank_shift.max():.0f} "
+      f"(median {JACK.max_rank_shift.median():.0f}); dropping a town under 10,000 residents: worst shift "
+      f"{SMALL.max_rank_shift.max():.0f}, minimum Spearman {SMALL.spearman.min():.3f}")
+
+
+# ### 11b. Town map and contemporary spatial proxies
+# 
+# Town coordinates come from GeoNames (matched by name; 53 of 69 matches also agree exactly on the 2011 population). Road distance is approximated as straight-line distance times a circuity factor **estimated from the census itself**: the ratio of each town's reported road distance to its district headquarters to the straight-line distance.
+# 
+# Contemporary proxies (post-2011, public records): the current public inpatient network (Directorate of Health Services bed list tabled in the Legislative Assembly, plus Goa Medical College) and the 16 current fire stations (DFES). The two access indicators that these records cover are recomputed and the index is partially updated on the frozen 2011 scale.
+
+# In[22]:
+
+
+def haversine_km(lat1, lon1, lat2, lon2):
+    lat1, lon1, lat2, lon2 = map(np.radians, (lat1, lon1, lat2, lon2))
+    a = np.sin((lat2 - lat1) / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2) ** 2
+    return 6371.0 * 2 * np.arcsin(np.sqrt(a))
+
+
+TC = F[["census_code", "town"]].merge(COORDS[["census_code", "lat", "lon"]], on="census_code", how="left")
+assert TC.lat.notna().all(), "every analysed town needs coordinates"
+LAT, LON = TC.lat.values, TC.lon.values
+DMAT = haversine_km(LAT[:, None], LON[:, None], LAT[None, :], LON[None, :])
+
+ctown = COORDS.set_index("town")
+hq_lat = np.where(F.district == "North Goa", ctown.loc["Panaji", "lat"], ctown.loc["Margao", "lat"])
+hq_lon = np.where(F.district == "North Goa", ctown.loc["Panaji", "lon"], ctown.loc["Margao", "lon"])
+straight_hq = haversine_km(LAT, LON, hq_lat, hq_lon)
+okc = (raw.dist_district_hq_km.values > 3) & (straight_hq > 2)
+ratio = raw.dist_district_hq_km.values[okc] / straight_hq[okc]
+CIRC = float(np.median(ratio))
+print(f"Circuity factor (census road km / straight-line km to district HQ, n={okc.sum()}): median {CIRC:.2f}, "
+      f"IQR {np.percentile(ratio, 25):.2f}-{np.percentile(ratio, 75):.2f}")
+
+CF = pd.read_csv(RAW / "spatial" / "contemporary_facilities.csv")
+
+
+def access_to(sub):
+    d = haversine_km(LAT[:, None], LON[:, None], sub.lat.values[None, :], sub.lon.values[None, :]) * CIRC
+    for j, t in enumerate(sub.census_town.values):
+        if isinstance(t, str):
+            d[(TC.town == t).values, j] = 0.0
+    return d.min(axis=1)
+
+
+HOSP_NOW = CF[(CF.facility_type == "health") & (CF.functional_beds.fillna(999) >= 30)]   # GMC, DH, SDH, CHC
+INPT_NOW = CF[CF.facility_type == "health"]                                            # + bedded PHCs
+FIRE_NOW = CF[CF.facility_type == "fire"]
+NOW = pd.DataFrame({"census_code": F.census_code, "town": F.town, "district": F.district,
+                    "hosp_2011": F.acc_hospital_km.values, "hosp_now": access_to(HOSP_NOW),
+                    "inpatient_now": access_to(INPT_NOW), "fire_2011": F.acc_fire_km.values, "fire_now": access_to(FIRE_NOW)})
+print(f"Public hospitals >=30 beds now: {len(HOSP_NOW)}; bedded PHCs: {len(INPT_NOW) - len(HOSP_NOW)}; fire stations: {len(FIRE_NOW)}")
+print(f"Median km to hospital: 2011 census {NOW.hosp_2011.median():.1f} | now (public, >=30 beds) {NOW.hosp_now.median():.1f} | "
+      f"now (any public inpatient) {NOW.inpatient_now.median():.1f}")
+print(f"Median km to fire station: 2011 {NOW.fire_2011.median():.1f} | now {NOW.fire_now.median():.1f}; "
+      f"towns with a fire station within 5 km: 2011 {(NOW.fire_2011 <= 5).sum()} | now {(NOW.fire_now <= 5).sum()}")
+
+F_NOW = F.copy()
+F_NOW["acc_hospital_km"] = NOW.hosp_now.values
+F_NOW["acc_fire_km"] = NOW.fire_now.values
+IS_NOW = aggregate(pillar_table(score_indicators(F_NOW, BOUNDS)), BASE_W).values
+NOW["is_2011"], NOW["is_partial_update"] = IS0, IS_NOW
+NOW["rank_2011"] = pd.Series(IS0).rank(ascending=False).values
+NOW["rank_update"] = pd.Series(IS_NOW).rank(ascending=False).values
+RHO_UPDATE = spearmanr(IS0, IS_NOW).statistic
+_r = spearmanr(IS0, NOW.inpatient_now); RHO_HOSP_NOW, P_HOSP_NOW = _r.statistic, _r.pvalue
+print(f"Partially updated index vs 2011 index: Spearman {RHO_UPDATE:.3f}; 2011 InfraScore vs current km to any public "
+      f"inpatient facility: Spearman {RHO_HOSP_NOW:.2f} (p = {P_HOSP_NOW:.3f})")
+
+# re-run the peer-gap classification on the partially updated index (same model, same features, same protocol)
+est, grid = MODELS[BEST]
+y_now = pd.Series(IS_NOW)
+oof_now = np.mean([cross_val_predict(tuned(est, grid), X, y_now, cv=KFold(5, shuffle=True, random_state=s)) for s in range(5)], axis=0)
+gap_now = IS_NOW - oof_now
+q90_now = np.quantile(np.abs(gap_now), 0.90)
+NOW["gap_update"] = gap_now
+NOW["flag_update"] = np.where(gap_now < -q90_now, "under-served", np.where(gap_now > q90_now, "above", "within"))
+UNDER_2011 = GAP[GAP.flag == "Significantly under-served"].town.tolist()
+UNDER_NOW = NOW[NOW.flag_update == "under-served"].town.tolist()
+print(f"Under-served on 2011 data: {UNDER_2011}; on the partially updated index: {UNDER_NOW} (band +/-{q90_now:.1f})")
+display(NOW[NOW.town.isin(set(UNDER_2011) | set(UNDER_NOW) | {"Usgao", "Sanquelim"})]
+        [["town", "hosp_2011", "hosp_now", "inpatient_now", "fire_2011", "fire_now", "rank_2011", "rank_update", "flag_update"]].round(1))
+
+
+# In[23]:
+
+
+GOA = json.load(open(RAW / "spatial" / "goa_districts_datta07.geojson"))
+LAT0 = np.cos(np.radians(15.4))
+
+
+def draw_goa(ax):
+    for ft in GOA["features"]:
+        geom = ft["geometry"]
+        polys = [geom["coordinates"]] if geom["type"] == "Polygon" else geom["coordinates"]
+        for poly in polys:
+            ring = np.array(poly[0])
+            ax.fill(ring[:, 0], ring[:, 1], color="#f3f4f6", ec="#9aa1a9", lw=0.5, zorder=0)
+    ax.set_aspect(1 / LAT0)
+    ax.set_xlim(73.66, 74.36); ax.set_ylim(14.88, 15.82)
+    ax.set_xticks([]); ax.set_yticks([]); ax.grid(False)
+    for s in ax.spines.values():
+        s.set_visible(False)
+
+
+gap_by_code = GAP.set_index("census_code")
+FLAG_UNDER = TC.census_code.map(gap_by_code.flag).eq("Significantly under-served").values
+fig, axes = plt.subplots(1, 3, figsize=(COL2, 3.6), gridspec_kw={"width_ratios": [1, 1, 1.25]})
+ax = axes[0]
+draw_goa(ax)
+sc = ax.scatter(LON, LAT, c=IS0, cmap="RdYlGn", vmin=20, vmax=75, s=6 + F.population / 2500, ec="#333333", lw=0.3, zorder=3)
+ax.scatter(LON[FLAG_UNDER], LAT[FLAG_UNDER], s=70, facecolors="none", ec="#b2182b", lw=1.2, zorder=4)
+ax.scatter([orgao.lon], [orgao.lat], marker="x", s=18, color="#555555", lw=0.8, zorder=4)
+lab = list(np.where(FLAG_UNDER)[0]) + list(F.index[F.town.isin(["Panaji", "Margao", "Mapusa"])])
+label_points(ax, LON[lab], LAT[lab], F.town.values[lab].tolist(), fontsize=5.6,
+             sides=["l" if F.town.values[k] in ("Panaji", "Mapusa") else "r" for k in lab])
+ax.annotate("Orgao (no record)", (orgao.lon, orgao.lat), xytext=(10, 14), textcoords="offset points", fontsize=5.2, color="#555555",
+            arrowprops=dict(arrowstyle="-", color="#8a8a8a", lw=0.5))
+cb = fig.colorbar(sc, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02); cb.ax.tick_params(labelsize=5.5)
+cb.set_label("InfraScore (2011)", fontsize=6); cb.outline.set_visible(False)
+ax.set_title("(a) 2011 InfraScore (ring = flagged)", fontsize=7)
+
+ax = axes[1]
+draw_goa(ax)
+sc2 = ax.scatter(LON, LAT, c=NOW.inpatient_now, cmap="YlOrRd", vmin=0, vmax=15, s=10, ec="#333333", lw=0.3, zorder=3)
+h = HOSP_NOW
+ax.scatter(h.lon, h.lat, marker="P", s=26, color="#1f3b73", ec="white", lw=0.4, zorder=5, label="Hospital/CHC (>=30 beds)")
+p = INPT_NOW[INPT_NOW.functional_beds.fillna(999) < 30]
+ax.scatter(p.lon, p.lat, marker="+", s=16, color="#1f3b73", lw=0.7, zorder=5, label="Bedded PHC")
+ax.scatter(FIRE_NOW.lon, FIRE_NOW.lat, marker="^", s=14, color="#c8553d", ec="white", lw=0.3, zorder=5, label="Fire station")
+cb2 = fig.colorbar(sc2, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02); cb2.ax.tick_params(labelsize=5.5)
+cb2.set_label("km to public inpatient care (now)", fontsize=6); cb2.outline.set_visible(False)
+ax.legend(loc="lower left", fontsize=5, handletextpad=0.2, borderaxespad=0.1, labelspacing=0.25, markerscale=0.8)
+ax.set_title("(b) Contemporary public facilities", fontsize=7)
+
+ax = axes[2]
+FLAG_COL2 = {"Significantly under-served": "#c8553d", "Significantly over-performing": "#2a9d8f", "Within expected range": GREY}
+lo_, hi_ = 18, 77
+xx = np.linspace(lo_, hi_, 10)
+ax.fill_between(xx, xx - q90, xx + q90, color="#eef1f4", zorder=1)
+ax.plot(xx, xx, "--", color="#999999", lw=0.8, zorder=2)
+ax.scatter(GAP.expected, GAP.infrascore, c=GAP.flag.map(FLAG_COL2), s=12, ec="white", lw=0.3, zorder=3)
+labg = GAP[GAP.flag != "Within expected range"]
+label_points(ax, labg.expected.values, labg.infrascore.values, labg.town.tolist(), fontsize=5.6,
+             sides=["l" if f == "Significantly over-performing" else "r" for f in labg.flag])
+ax.set_xlim(lo_, hi_); ax.set_ylim(lo_, hi_); ax.set_aspect("equal", adjustable="box")
+ax.set_xlabel("Expected (out-of-fold)", fontsize=6.5); ax.set_ylabel("Actual InfraScore", fontsize=6.5)
+ax.tick_params(labelsize=6)
+ax.set_title(f"(c) Peer gaps, 90% band $\\pm${q90:.1f}", fontsize=7)
+fig.tight_layout(w_pad=0.6)
+savefig(fig, "fig11_map_contemporary_gaps.png")
+
+
+# ### 11c. Does the 90% interval cover 90%? Spatial dependence of the gaps
+# 
+# The V1 band used the 90th percentile of all 69 out-of-fold residuals. Here the procedure is tested honestly: in each outer fold the calibration quantile is computed **only from training towns** (inner out-of-fold residuals), and coverage is measured on held-out towns. Two schemes: random 5-fold (10 repeats) and leave-one-taluka-out (a spatial block test). Moran's I tests whether the gaps are spatially clustered, which would violate the exchangeability that conformal intervals assume.
+
+# In[24]:
+
+
+from sklearn.model_selection import LeaveOneGroupOut
+
+
+def conf_q(res, a):
+    n = len(res)
+    return np.quantile(res, min(1.0, np.ceil((n + 1) * a) / n), method="higher")
+
+
+def coverage_runs(splitters, groups=None, alphas=(0.8, 0.9, 0.95)):
+    rows = []
+    est, grid = MODELS[BEST]
+    for r, sp in enumerate(splitters):
+        for tr, te in sp.split(X, yv, groups):
+            inner_pred = cross_val_predict(tuned(est, grid), X.iloc[tr], yv.iloc[tr], cv=KFold(5, shuffle=True, random_state=r))
+            res = np.abs(yv.iloc[tr].values - inner_pred)
+            pred = tuned(est, grid).fit(X.iloc[tr], yv.iloc[tr]).predict(X.iloc[te])
+            err = np.abs(yv.iloc[te].values - pred)
+            grp_tr = D.is_statutory_town.iloc[tr].values
+            for a in alphas:
+                q_plain = np.quantile(res, a)                                    # V1 rule: plain empirical quantile
+                q = conf_q(res, a)                                               # finite-sample (split-conformal) quantile
+                q_grp = {g_: conf_q(res[grp_tr == g_], a) for g_ in (0, 1)}      # Mondrian (group-conditional)
+                for k, idx in enumerate(te):
+                    g_ = int(D.is_statutory_town.iloc[idx])
+                    rows.append({"scheme_run": r, "alpha": a, "town": D.town.iloc[idx], "statutory": g_,
+                                 "covered_plain": bool(err[k] <= q_plain), "half_width_plain": q_plain,
+                                 "covered": bool(err[k] <= q), "half_width": q,
+                                 "covered_mondrian": bool(err[k] <= q_grp[g_]), "half_width_mondrian": q_grp[g_]})
+    return pd.DataFrame(rows)
+
+
+t = time.time()
+COV_RAND = coverage_runs([KFold(5, shuffle=True, random_state=100 + r) for r in range(10)])
+COV_TAL = coverage_runs([LeaveOneGroupOut()], groups=F.taluka.values)
+print(f"coverage tests: {time.time() - t:.0f}s")
+
+
+def cov_summary(df, label):
+    out = []
+    for rule, col, hw in [("plain (V1)", "covered_plain", "half_width_plain"), ("conformal", "covered", "half_width"),
+                          ("Mondrian", "covered_mondrian", "half_width_mondrian")]:
+        g = df.groupby(["alpha", "scheme_run"])[col].mean().groupby("alpha")
+        out.append(pd.DataFrame({"scheme": label, "rule": rule, "nominal": g.mean().index, "empirical": g.mean().values,
+                                 "min_run": g.min().values, "max_run": g.max().values,
+                                 "half_width": df.groupby("alpha")[hw].mean().values,
+                                 "cov_statutory": df[df.statutory == 1].groupby("alpha")[col].mean().values,
+                                 "cov_census_town": df[df.statutory == 0].groupby("alpha")[col].mean().values}))
+    return pd.concat(out, ignore_index=True)
+
+
+COVERAGE_TEST = pd.concat([cov_summary(COV_RAND, "random 5-fold x10"), cov_summary(COV_TAL, "leave-one-taluka-out")], ignore_index=True)
+display(COVERAGE_TEST.round(3))
+CT90 = COVERAGE_TEST[COVERAGE_TEST.nominal == 0.9].set_index(["scheme", "rule"])
+
+# Full-sample bands: plain (V1), finite-sample conformal, and group-conditional (Mondrian). Are the flags robust?
+GAP["statutory"] = (GAP.civic_status != "Census Town").astype(int)
+Q_CORR = conf_q(np.abs(GAP.gap.values), 0.90)
+UNDER_CORR = GAP[GAP.gap < -Q_CORR].town.tolist()
+print(f"Finite-sample conformal 90% half-width {Q_CORR:.1f} (V1 plain {q90:.1f}); under-served: {UNDER_CORR}")
+Q_MOND = {g_: conf_q(np.abs(GAP.gap[GAP.statutory == g_].values), 0.90) for g_ in (0, 1)}
+GAP["q_mondrian"] = GAP.statutory.map(Q_MOND)
+GAP["flag_mondrian"] = np.select([GAP.gap < -GAP.q_mondrian, GAP.gap > GAP.q_mondrian], ["under-served", "above"], "within")
+UNDER_MOND = GAP[GAP.flag_mondrian == "under-served"].town.tolist()
+print(f"Mondrian 90% half-widths: statutory {Q_MOND[1]:.1f}, census towns {Q_MOND[0]:.1f}; under-served under Mondrian bands: {UNDER_MOND}")
+display(GAP[GAP.town.isin(["Cuncolim", "Quepem", "Sancoale"])][["town", "civic_status", "gap", "q_mondrian", "flag_mondrian"]].round(1))
+
+
+def morans_i(z, dmax=15.0, perms=9999, seed=SEED):
+    z = np.asarray(z, float); z = z - z.mean()
+    W = np.where((DMAT > 0) & (DMAT <= dmax), 1.0 / np.maximum(DMAT, 1e-9), 0.0)
+    n, S0 = len(z), W.sum()
+    stat = lambda v: n / S0 * (v @ W @ v) / (v @ v)
+    I = stat(z)
+    rng = np.random.default_rng(seed)
+    null = np.array([stat(rng.permutation(z)) for _ in range(perms)])
+    return I, (np.sum(null >= I) + 1) / (perms + 1), -1 / (n - 1)
+
+
+gap_aligned = F.census_code.map(gap_by_code.gap).values
+MORAN = pd.DataFrame([("InfraScore", *morans_i(IS0)), ("Peer gap (residual)", *morans_i(gap_aligned))],
+                     columns=["variable", "morans_I", "p_perm", "expected_I"])
+display(MORAN.round(3))
+
+
+# ### 11d. Spillover-aware allocation with sourced capital and operating costs
+# 
+# **Spillovers.** A new hospital, fire station, library, hall, college or stadium in town *i* also shortens the access distance of every other town *j* to `min(current_j, circuity x straight-line(i, j))`. Per-capita indicators change only in the receiving town. Because InfraScore is linear in the indicator scores, the gain of every candidate action for every town is computed in closed form.
+# 
+# **Costs.** Capital costs are recent Goa project figures; operating costs come from a published costing study (health, uprated with the CPI), the DFES budget (fire) or are stated assumptions (college, stadium, hall, library). Lifecycle cost = capital + 10 years of operating cost discounted at 8%. Bank branches are excluded because they are private investments. A 200-draw Monte Carlo perturbs every capital and operating cost independently (log-normal, sigma = 0.4).
+
+# In[25]:
+
+
+COSTS = pd.read_csv(RAW / "costs" / "facility_costs.csv").set_index("facility")
+DISC, YEARS = 0.08, 10
+ANNUITY = (1 - (1 + DISC) ** -YEARS) / DISC
+COSTS["lifecycle_cr"] = COSTS.capex_cr + COSTS.opex_cr_per_yr * ANNUITY
+COSTS["capex_units_vs_PHC"] = COSTS.capex_cr / COSTS.loc["Primary health centre", "capex_cr"]
+COSTS["illustrative_units_v1"] = COSTS.index.map(BASE_COST)
+display(COSTS[["capex_cr", "opex_cr_per_yr", "lifecycle_cr", "capex_units_vs_PHC", "illustrative_units_v1"]].round(2))
+DFES_CAPEX_2025 = 37.35
+print(f"Annuity factor {ANNUITY:.3f}. One fire station = {COSTS.loc['Fire station', 'capex_cr'] / DFES_CAPEX_2025:.0%} of the "
+      f"DFES 2025-26 capital budget (Rs {DFES_CAPEX_2025} cr); its 10-year operating cost (PV) is "
+      f"{COSTS.loc['Fire station', 'opex_cr_per_yr'] * ANNUITY / COSTS.loc['Fire station', 'capex_cr']:.1f}x its capital cost")
+
+IND_NAMES = list(INDICATORS)
+IDX = {c: k for k, c in enumerate(IND_NAMES)}
+N_IN_PILLAR = {p: sum(1 for c in IND_NAMES if INDICATORS[c][0] == p) for p in PILLARS}
+WVEC = np.array([W_NORM[INDICATORS[c][0]] / N_IN_PILLAR[INDICATORS[c][0]] for c in IND_NAMES])
+LO = {c: BOUNDS[c][0] for c in IND_NAMES if INDICATORS[c][1] == "density"}
+HI = {c: BOUNDS[c][1] for c in IND_NAMES if INDICATORS[c][1] == "density"}
+
+
+def ind_score(c, v):
+    kind = INDICATORS[c][1]
+    if kind == "access":
+        return 100 * np.exp(-v / 10.0)
+    if kind == "ratio":
+        return 100 * v
+    return 100 * (np.clip(v, LO[c], HI[c]) - LO[c]) / (HI[c] - LO[c])
+
+
+def is_from_state(S):
+    return sum(WVEC[IDX[c]] * ind_score(c, S[:, IDX[c]]) for c in IND_NAMES)
+
+
+S0_STATE = F[IND_NAMES].values.astype(float)
+assert np.allclose(is_from_state(S0_STATE), IS0), "closed-form scorer must reproduce the index"
+ACCESS_OF = {"Hospital": "acc_hospital_km", "Fire station": "acc_fire_km", "Public library": "acc_library_km",
+             "Auditorium / community hall": "acc_auditorium_km", "Degree college": "acc_degree_college_km", "Stadium": "acc_stadium_km"}
+DENSITY_OF = {"Primary health centre": "primary_care_per_10k", "Hospital": "hospitals_per_10k", "Bank branch": "banks_per_10k"}
+CAND_ARR = {a: np.isin(F.census_code.values, CAND[CAND.facility == a].census_code.values) for a in CAND.facility.unique()}
+REACH = CIRC * DMAT
+np.fill_diagonal(REACH, 0.0)
+POPV = F.population.values.astype(float)
+
+
+def feasible_mask(a, S):
+    if a in ("Public library", "Auditorium / community hall", "Degree college", "Stadium"):
+        return CAND_ARR[a] & (S[:, IDX[ACCESS_OF[a]]] > 0)
+    if a in ("Hospital", "Fire station"):
+        return S[:, IDX[ACCESS_OF[a]]] > 0
+    if a == "Bank branch":
+        return bank_ok.copy()
+    return np.ones(len(F), bool)
+
+
+def action_deltas(a, S, spill):
+    """Matrix (site i x town j) of score gains if action a is placed at site i."""
+    n = len(F)
+    dmat = np.zeros((n, n))
+    if a in ACCESS_OF:
+        c = ACCESS_OF[a]; k = IDX[c]; cur = S[:, k]
+        new = np.minimum(cur[None, :], REACH) if spill else np.where(np.eye(n, dtype=bool), 0.0, cur[None, :])
+        dmat += WVEC[k] * (ind_score(c, new) - ind_score(c, cur)[None, :])
+    if a in DENSITY_OF:
+        c = DENSITY_OF[a]; k = IDX[c]; cur = S[:, k]
+        dmat[np.arange(n), np.arange(n)] += WVEC[k] * (ind_score(c, cur + 1e4 / POPV) - ind_score(c, cur))
+    return dmat
+
+
+def apply_action(a, i, S, spill):
+    S = S.copy()
+    if a in ACCESS_OF:
+        k = IDX[ACCESS_OF[a]]
+        S[:, k] = np.minimum(S[:, k], REACH[i]) if spill else S[:, k]
+        S[i, k] = 0.0
+    if a in DENSITY_OF:
+        k = IDX[DENSITY_OF[a]]
+        S[i, k] += 1e4 / POPV[i]
+    return S
+
+
+def allocate(strategy, actions, cost=None, budget=None, K=None, spill=True, seed=0, start=None):
+    """Greedy / heuristic allocation. Either K (count budget) or cost+budget (Rs crore).
+    start: optional initial indicator state (towns x indicators); default = 2011 census state."""
+    S = (S0_STATE if start is None else start).copy()
+    cur, spent, plan = is_from_state(S), 0.0, []
+    rng = np.random.default_rng(seed)
+    while True:
+        if K is not None and len(plan) >= K:
+            break
+        wts = POPV * (100 - cur) / (100 - MEAN_IS)
+        best, cands = None, []
+        for a in actions:
+            if cost is not None and cost[a] > budget - spent + 1e-9:
+                continue
+            m = feasible_mask(a, S)
+            if not m.any():
+                continue
+            dm = action_deltas(a, S, spill)
+            ben = dm @ wts
+            own = np.diag(dm)
+            for i in np.where(m & (ben > 1e-9))[0]:
+                cands.append((a, i, ben[i], own[i]))
+        if not cands:
+            break
+        if strategy == "greedy_cost":
+            a, i, b, _ = max(cands, key=lambda z: z[2] / cost[z[0]])
+        elif strategy == "greedy":
+            a, i, b, _ = max(cands, key=lambda z: z[2])
+        elif strategy == "lowest_first":
+            j = min({z[1] for z in cands}, key=lambda t: cur[t])
+            a, i, b, _ = max([z for z in cands if z[1] == j], key=lambda z: z[2])
+        elif strategy == "largest_first":
+            j = max({z[1] for z in cands}, key=lambda t: POPV[t])
+            a, i, b, _ = max([z for z in cands if z[1] == j], key=lambda z: z[2])
+        else:
+            a, i, b, _ = cands[rng.integers(len(cands))]
+        S = apply_action(a, i, S, spill)
+        new = is_from_state(S)
+        plan.append({"step": len(plan) + 1, "town": F.town[i], "action": a, "cost_cr": (cost[a] if cost is not None else np.nan),
+                     "own_gain": new[i] - cur[i], "towns_improved": int((new - cur > 1e-9).sum())})
+        spent += cost[a] if cost is not None else 0
+        cur = new
+    return cur, pd.DataFrame(plan)
+
+
+# sanity check: without spillover, the closed-form allocator reproduces the V1 ten-step plan exactly
+_, chk = allocate("greedy", ACTIONS, K=10, spill=False)
+v1 = PLANS[("Greedy optimiser", 10)]
+assert (chk.town.values == v1.town.values).all() and (chk.action.values == v1.action.values).all()
+print("V1 ten-step plan reproduced by the closed-form allocator.")
+
+
+# In[26]:
+
+
+# (i) Ten-intervention experiment (count budget), with and without spillovers
+SPILL_ROWS, SPILL_PLANS = [], {}
+for spill in (False, True):
+    for strat, lab_ in [("greedy", "Greedy optimiser"), ("lowest_first", "Lowest score first"), ("largest_first", "Largest towns first")]:
+        cur, plan = allocate(strat, ACTIONS, K=10, spill=spill)
+        SPILL_ROWS.append({"spillover": spill, "strategy": lab_, **metrics(cur)}); SPILL_PLANS[(lab_, spill)] = plan
+    rnd = pd.DataFrame([metrics(allocate("random", ACTIONS, K=10, spill=spill, seed=s)[0]) for s in range(200)]).mean()
+    SPILL_ROWS.append({"spillover": spill, "strategy": "Random (mean of 200)", **rnd.to_dict()})
+K10 = pd.DataFrame(SPILL_ROWS)
+display(K10.round(3))
+p_off, p_on = SPILL_PLANS[("Greedy optimiser", False)], SPILL_PLANS[("Greedy optimiser", True)]
+SHARED_TOWNS = sorted(set(p_off.town) & set(p_on.town))
+print(f"Greedy K=10 with spillovers: towns {sorted(set(p_on.town))}; shared with no-spillover plan: {SHARED_TOWNS}")
+display(p_on)
+K10i = K10.set_index(["spillover", "strategy"]).pop_weighted_gain
+RATIO_NOSPILL = K10i[(False, "Greedy optimiser")] / K10i[(False, "Random (mean of 200)")]
+RATIO_SPILL = K10i[(True, "Greedy optimiser")] / K10i[(True, "Random (mean of 200)")]
+print(f"Greedy / random: {RATIO_NOSPILL:.2f} without spillover, {RATIO_SPILL:.2f} with spillover")
+# Why does Quepem leave the spillover-aware plan? Its hospital distance after the Curchorem-Cacora hospital:
+iq, ic = F.index[F.town == "Quepem"][0], F.index[F.town == "Curchorem-Cacora"][0]
+print(f"Quepem km to hospital: 2011 {F.acc_hospital_km[iq]:.0f}; after a hospital in Curchorem-Cacora (spillover) "
+      f"{min(F.acc_hospital_km[iq], REACH[ic, iq]):.1f}")
+
+
+# In[27]:
+
+
+# (ii) Realistic lifecycle-cost budget (public facilities only), spillovers on
+PUBLIC_ACTIONS = [a for a in ACTIONS if a != "Bank branch"]
+LC = COSTS.lifecycle_cr.to_dict()
+BUDGETS = (100, 250, 500)
+BUD_ROWS, BUD_PLANS = [], {}
+for B in BUDGETS:
+    for strat, lab_ in [("greedy_cost", "Cost-aware greedy"), ("greedy", "Greedy (ignores cost)"), ("lowest_first", "Lowest score first")]:
+        cur, plan = allocate(strat, PUBLIC_ACTIONS, cost=LC, budget=B, spill=True)
+        BUD_ROWS.append({"budget_cr": B, "strategy": lab_, "n_facilities": len(plan), "spent_cr": plan.cost_cr.sum(), **metrics(cur)})
+        BUD_PLANS[(lab_, B)] = plan
+    rr = [allocate("random", PUBLIC_ACTIONS, cost=LC, budget=B, spill=True, seed=s) for s in range(30)]
+    BUD_ROWS.append({"budget_cr": B, "strategy": "Random (mean of 30)", "n_facilities": np.mean([len(p) for _, p in rr]),
+                     "spent_cr": np.mean([p.cost_cr.sum() for _, p in rr]), **pd.DataFrame([metrics(c) for c, _ in rr]).mean().to_dict()})
+BUDGET_TAB = pd.DataFrame(BUD_ROWS)
+display(BUDGET_TAB.round(3))
+PLAN250 = BUD_PLANS[("Cost-aware greedy", 250)]
+COMPOSITION = PLAN250.groupby("action").agg(n=("town", "size"), spend_cr=("cost_cr", "sum")).sort_values("spend_cr", ascending=False)
+display(COMPOSITION.round(1))
+
+# Essential-services variant: the same Rs 250 crore restricted to health and fire facilities
+ESSENTIAL = ["Primary health centre", "Hospital", "Fire station"]
+ess_rows = {}
+for strat, lab_ in [("greedy_cost", "Cost-aware greedy"), ("greedy", "Greedy (ignores cost)"), ("lowest_first", "Lowest score first")]:
+    cur, plan = allocate(strat, ESSENTIAL, cost=LC, budget=250, spill=True)
+    ess_rows[lab_] = {"n_facilities": len(plan), "spent_cr": plan.cost_cr.sum(), **metrics(cur)}; BUD_PLANS[(lab_ + " (essential)", 250)] = plan
+rr = [allocate("random", ESSENTIAL, cost=LC, budget=250, spill=True, seed=s) for s in range(30)]
+ess_rows["Random (mean of 30)"] = {"n_facilities": np.mean([len(p) for _, p in rr]), "spent_cr": np.mean([p.cost_cr.sum() for _, p in rr]),
+                                   **pd.DataFrame([metrics(c) for c, _ in rr]).mean().to_dict()}
+ESSENTIAL_TAB = pd.DataFrame(ess_rows).T
+display(ESSENTIAL_TAB.round(3))
+PLAN250_ESS = BUD_PLANS[("Cost-aware greedy (essential)", 250)]
+display(Markdown("**Essential-services plan (health and fire only), Rs 250 crore**")); display(PLAN250_ESS.round(2))
+
+# The same essential-services budget, starting from the contemporary network (Section 11b) rather than 2011
+S_NOW_STATE = F_NOW[IND_NAMES].values.astype(float)
+cur_now_end, PLAN_NOW_ESS = allocate("greedy_cost", ESSENTIAL, cost=LC, budget=250, spill=True, start=S_NOW_STATE)
+GAIN_NOW_ESS = np.average(cur_now_end - IS_NOW, weights=POPV)
+display(Markdown("**Essential-services plan from the contemporary network, Rs 250 crore**")); display(PLAN_NOW_ESS.round(2))
+print(f"Population-weighted gain from the contemporary start: {GAIN_NOW_ESS:.2f} points")
+display(Markdown("**Cost-aware plan, Rs 250 crore lifecycle budget, with spillovers**")); display(PLAN250.round(2))
+
+rng = np.random.default_rng(SEED)
+mc_rows = []
+t = time.time()
+for d in range(200):
+    f_cap = {a: float(np.exp(rng.normal(0, 0.4))) for a in PUBLIC_ACTIONS}
+    f_op = {a: float(np.exp(rng.normal(0, 0.4))) for a in PUBLIC_ACTIONS}
+    lc = {a: COSTS.loc[a, "capex_cr"] * f_cap[a] + COSTS.loc[a, "opex_cr_per_yr"] * f_op[a] * ANNUITY for a in PUBLIC_ACTIONS}
+    row = {}
+    for strat, lab_ in [("greedy_cost", "Cost-aware greedy"), ("greedy", "Greedy (ignores cost)"), ("lowest_first", "Lowest score first"), ("random", "Random")]:
+        row[lab_] = metrics(allocate(strat, PUBLIC_ACTIONS, cost=lc, budget=250, spill=True, seed=d)[0])["pop_weighted_gain"]
+    mc_rows.append(row)
+MC_REAL = pd.DataFrame(mc_rows)
+WIN_REAL = {k: float((MC_REAL["Cost-aware greedy"] > MC_REAL[k]).mean()) for k in MC_REAL.columns if k != "Cost-aware greedy"}
+print(f"Monte Carlo ({time.time() - t:.0f}s): cost-aware greedy beats", {k: f"{v:.0%}" for k, v in WIN_REAL.items()},
+      "| mean gains", MC_REAL.mean().round(3).to_dict())
+
+
+# In[28]:
+
+
+COVERAGE.to_csv(OUT / "coverage_audit.csv")
+JACK.round(4).to_csv(OUT / "leave_one_town_out.csv", index=False)
+NOW.round(3).to_csv(OUT / "contemporary_access.csv", index=False)
+COVERAGE_TEST.round(4).to_csv(OUT / "interval_coverage_test.csv", index=False)
+MORAN.round(4).to_csv(OUT / "morans_i.csv", index=False)
+COSTS.round(4).to_csv(OUT / "facility_costs_lifecycle.csv")
+K10.round(4).to_csv(OUT / "allocation_k10_spillover.csv", index=False)
+BUDGET_TAB.round(4).to_csv(OUT / "allocation_realistic_budget.csv", index=False)
+PLAN250.round(3).to_csv(OUT / "plan_rs250cr_cost_aware.csv", index=False)
+PLAN250_ESS.round(3).to_csv(OUT / "plan_rs250cr_essential_services.csv", index=False)
+PLAN_NOW_ESS.round(3).to_csv(OUT / "plan_rs250cr_essential_from_contemporary.csv", index=False)
+ESSENTIAL_TAB.round(4).to_csv(OUT / "allocation_essential_services.csv")
+GAP[["town", "civic_status", "gap", "q_mondrian", "flag_mondrian"]].round(3).to_csv(OUT / "gap_mondrian_flags.csv", index=False)
+MC_REAL.round(4).to_csv(OUT / "realistic_cost_scenarios.csv", index=False)
+
+
+# ## 12. Export results
+
+# In[29]:
 
 
 R.round(2).to_csv(OUT / "infrascore_rankings.csv", index=False)
@@ -1280,11 +1812,11 @@ print(f"Saved {len(list(OUT.glob('*.csv')))} tables and {len(list(FIG.glob('*.pn
 print(f"Total runtime: {time.time() - T0:.0f} s")
 
 
-# ## 12. Summary of findings
+# ## 13. Summary of findings
 # 
 # The cell below prints the headline numbers used in the report, so every figure quoted in the paper can be traced to this run.
 
-# In[22]:
+# In[30]:
 
 
 g10 = PLANS[("Greedy optimiser", 10)]
@@ -1302,6 +1834,20 @@ POLICY K=10  pop-weighted gain: greedy {s10.loc['Greedy optimiser', 'pop_weighte
 COSTED       budget {BUDGET:g} units: cost-aware greedy {COST_TAB.set_index('strategy').loc['Cost-aware greedy', 'pop_weighted_gain']:.2f} | ignores-cost {COST_TAB.set_index('strategy').loc['Greedy (ignores cost)', 'pop_weighted_gain']:.2f} | lowest-first {COST_TAB.set_index('strategy').loc['Lowest score first', 'pop_weighted_gain']:.2f} | random {COST_TAB.set_index('strategy').loc['Random', 'pop_weighted_gain']:.2f}
              wins in 200 cost scenarios vs: {', '.join(f'{k} {v:.0%}' for k, v in win.items())}
 EVIDENCE     plan assignments after 2011: exact {(CHK.match == 'exact').sum()} of {len(CHK)}, exact or related {CHK.corroborated.sum()} of {len(CHK)}; towns exact {len(exact_towns)} of {len(towns_plan)}, exact or related {len(any_towns)} of {len(towns_plan)}; random controls {ctrl_hits} of {len(eligible)} (Fisher p = {FISHER.pvalue:.2f})
+COVERAGE     {analysed['Towns']} of {OFFICIAL['Towns']} towns ({analysed['Statutory towns']}/14 statutory, {analysed['Census towns']}/56 census towns); {analysed['Urban population']:,} of {OFFICIAL['Urban population']:,} urban residents ({analysed['Urban population'] / OFFICIAL['Urban population']:.2%}); Orgao {int(orgao.geonames_pop):,}
+             leave-one-town-out: worst rank shift {JACK.max_rank_shift.max():.0f}, median {JACK.max_rank_shift.median():.0f}; small towns min Spearman {SMALL.spearman.min():.3f}
+CONTEMPORARY circuity {CIRC:.2f}; median km hospital 2011 {NOW.hosp_2011.median():.1f} -> now >=30 beds {NOW.hosp_now.median():.1f}, any inpatient {NOW.inpatient_now.median():.1f}; fire {NOW.fire_2011.median():.1f} -> {NOW.fire_now.median():.1f}; fire<=5km towns {(NOW.fire_2011 <= 5).sum()} -> {(NOW.fire_now <= 5).sum()}
+             partial update vs 2011 rho {RHO_UPDATE:.3f}; 2011 IS vs current inpatient km rho {RHO_HOSP_NOW:.2f} (p={P_HOSP_NOW:.3f}); under-served on update: {', '.join(UNDER_NOW) or 'none'}
+INTERVALS    90% held-out coverage (random 5-fold x10 | taluka-out), overall / statutory / census / mean half-width:
+             plain V1  {CT90.loc[('random 5-fold x10', 'plain (V1)'), 'empirical']:.3f}/{CT90.loc[('random 5-fold x10', 'plain (V1)'), 'cov_statutory']:.3f}/{CT90.loc[('random 5-fold x10', 'plain (V1)'), 'cov_census_town']:.3f}/{CT90.loc[('random 5-fold x10', 'plain (V1)'), 'half_width']:.1f} | {CT90.loc[('leave-one-taluka-out', 'plain (V1)'), 'empirical']:.3f}/{CT90.loc[('leave-one-taluka-out', 'plain (V1)'), 'cov_statutory']:.3f}/{CT90.loc[('leave-one-taluka-out', 'plain (V1)'), 'cov_census_town']:.3f}/{CT90.loc[('leave-one-taluka-out', 'plain (V1)'), 'half_width']:.1f}
+             conformal {CT90.loc[('random 5-fold x10', 'conformal'), 'empirical']:.3f}/{CT90.loc[('random 5-fold x10', 'conformal'), 'cov_statutory']:.3f}/{CT90.loc[('random 5-fold x10', 'conformal'), 'cov_census_town']:.3f}/{CT90.loc[('random 5-fold x10', 'conformal'), 'half_width']:.1f} | {CT90.loc[('leave-one-taluka-out', 'conformal'), 'empirical']:.3f}/{CT90.loc[('leave-one-taluka-out', 'conformal'), 'cov_statutory']:.3f}/{CT90.loc[('leave-one-taluka-out', 'conformal'), 'cov_census_town']:.3f}/{CT90.loc[('leave-one-taluka-out', 'conformal'), 'half_width']:.1f}
+             Mondrian  {CT90.loc[('random 5-fold x10', 'Mondrian'), 'empirical']:.3f}/{CT90.loc[('random 5-fold x10', 'Mondrian'), 'cov_statutory']:.3f}/{CT90.loc[('random 5-fold x10', 'Mondrian'), 'cov_census_town']:.3f}/{CT90.loc[('random 5-fold x10', 'Mondrian'), 'half_width']:.1f} | {CT90.loc[('leave-one-taluka-out', 'Mondrian'), 'empirical']:.3f}/{CT90.loc[('leave-one-taluka-out', 'Mondrian'), 'cov_statutory']:.3f}/{CT90.loc[('leave-one-taluka-out', 'Mondrian'), 'cov_census_town']:.3f}/{CT90.loc[('leave-one-taluka-out', 'Mondrian'), 'half_width']:.1f}
+             run range (random, plain) {CT90.loc[('random 5-fold x10', 'plain (V1)'), 'min_run']:.2f}-{CT90.loc[('random 5-fold x10', 'plain (V1)'), 'max_run']:.2f}
+             full-sample half-widths: plain {q90:.1f} -> {', '.join(GAP[GAP.flag == 'Significantly under-served'].town)}; conformal {Q_CORR:.1f} -> {', '.join(UNDER_CORR) or 'none'}; Mondrian statutory {Q_MOND[1]:.1f} / census {Q_MOND[0]:.1f} -> {', '.join(UNDER_MOND) or 'none'}
+             Moran's I: InfraScore {MORAN.iloc[0].morans_I:.3f} (p={MORAN.iloc[0].p_perm:.3f}); gap {MORAN.iloc[1].morans_I:.3f} (p={MORAN.iloc[1].p_perm:.3f})
+SPILLOVER    K=10 greedy pop-weighted gain {K10i[(False, 'Greedy optimiser')]:.3f} (random {K10i[(False, 'Random (mean of 200)')]:.3f}, ratio {RATIO_NOSPILL:.2f}) -> {K10i[(True, 'Greedy optimiser')]:.3f} with spillover (random {K10i[(True, 'Random (mean of 200)')]:.3f}, ratio {RATIO_SPILL:.2f}); shared towns {', '.join(SHARED_TOWNS)}
+REAL COSTS   Rs 250 cr lifecycle: cost-aware {BUDGET_TAB[(BUDGET_TAB.budget_cr == 250) & (BUDGET_TAB.strategy == 'Cost-aware greedy')].pop_weighted_gain.iloc[0]:.2f} | cost-blind {BUDGET_TAB[(BUDGET_TAB.budget_cr == 250) & (BUDGET_TAB.strategy == 'Greedy (ignores cost)')].pop_weighted_gain.iloc[0]:.2f} | lowest-first {BUDGET_TAB[(BUDGET_TAB.budget_cr == 250) & (BUDGET_TAB.strategy == 'Lowest score first')].pop_weighted_gain.iloc[0]:.2f} | random {BUDGET_TAB[(BUDGET_TAB.budget_cr == 250) & (BUDGET_TAB.strategy.str.startswith('Random'))].pop_weighted_gain.iloc[0]:.2f}; MC wins {', '.join(f'{k} {v:.0%}' for k, v in WIN_REAL.items())}
+             essential services: cost-aware {ESSENTIAL_TAB.loc['Cost-aware greedy', 'pop_weighted_gain']:.2f} | cost-blind {ESSENTIAL_TAB.loc['Greedy (ignores cost)', 'pop_weighted_gain']:.2f}; plan {', '.join(PLAN250_ESS.town + ' ' + PLAN250_ESS.action)}; from today: {', '.join(PLAN_NOW_ESS.town + ' ' + PLAN_NOW_ESS.action)}
 VALIDATION   literacy rho {VAL.iloc[0].spearman_rho:.2f} (p={VAL.iloc[0].p:.3f}); partial (size-controlled) {VAL.iloc[0].partial_rho_ctrl_size:.2f} (p={VAL.iloc[0].p_partial:.3f})
 """)
 

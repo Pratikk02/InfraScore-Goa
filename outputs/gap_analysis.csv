@@ -1,70 +1,70 @@
-census_code,town,district,civic_status,population,infrascore,expected,gap,lower_90,upper_90,flag
-803250,Cuncolim,South Goa,Municipal Council,16623,29.62,48.88,-19.26,35.81,61.95,Significantly under-served
-803251,Quepem,South Goa,Municipal Council,14795,30.65,47.55,-16.9,34.48,60.61,Significantly under-served
-626886,Sancoale,South Goa,Census Town,21923,28.26,43.45,-15.19,30.38,56.51,Significantly under-served
-626728,Cumbarjua,North Goa,Census Town,4917,30.93,43.47,-12.54,30.4,56.53,Within expected range
-626658,Arambol,North Goa,Census Town,5322,26.19,37.57,-11.37,24.5,50.63,Within expected range
-626735,Mercurim,North Goa,Census Town,4970,30.35,40.85,-10.5,27.78,53.92,Within expected range
-626660,Parcem,North Goa,Census Town,4627,26.4,36.62,-10.22,23.55,49.69,Within expected range
-626969,Xeldem,South Goa,Census Town,7434,25.53,35.68,-10.15,22.62,48.75,Within expected range
-803248,Mormugao,South Goa,Municipal Council,94393,50.4,60.44,-10.04,47.38,73.51,Within expected range
-626867,Marcaim,North Goa,Census Town,6215,23.32,33.13,-9.81,20.06,46.2,Within expected range
-626661,Morjim,North Goa,Census Town,6760,27.96,37.53,-9.57,24.46,50.6,Within expected range
-626865,Candola,North Goa,Census Town,5354,23.44,32.93,-9.49,19.86,46.0,Within expected range
-626927,Sao Jose de Areal,South Goa,Census Town,10229,30.45,39.6,-9.15,26.53,52.66,Within expected range
-626703,Socorro,North Goa,Census Town,12908,34.61,41.31,-6.7,28.25,54.38,Within expected range
-626842,Onda,North Goa,Census Town,5863,25.14,31.74,-6.6,18.67,44.8,Within expected range
-626698,Nerul,North Goa,Census Town,5042,29.74,36.13,-6.4,23.07,49.2,Within expected range
-626730,Chimbel,North Goa,Census Town,15289,41.08,46.73,-5.65,33.66,59.79,Within expected range
-626928,Davorlim,South Goa,Census Town,15350,39.28,44.47,-5.19,31.4,57.54,Within expected range
-626870,Curti,North Goa,Census Town,16385,35.52,40.69,-5.16,27.62,53.75,Within expected range
-626694,Anjuna,North Goa,Census Town,9636,33.91,38.79,-4.88,25.72,51.86,Within expected range
-626764,Pale,North Goa,Census Town,6043,23.95,28.81,-4.86,15.74,41.88,Within expected range
-626695,Calangute,North Goa,Census Town,13810,37.39,41.47,-4.08,28.4,54.54,Within expected range
-626887,Cortalim,South Goa,Census Town,9080,37.98,40.94,-2.96,27.87,54.0,Within expected range
-626659,Mandrem,North Goa,Census Town,8336,33.6,36.28,-2.68,23.22,49.35,Within expected range
-626763,Carapur,North Goa,Census Town,5500,27.64,30.13,-2.49,17.07,43.2,Within expected range
-626873,Usgao,North Goa,Census Town,12436,31.12,33.51,-2.39,20.44,46.57,Within expected range
-803253,Sanguem,South Goa,Municipal Council,6444,44.28,46.49,-2.21,33.42,59.55,Within expected range
-626692,Moira,North Goa,Census Town,4299,35.93,37.95,-2.02,24.88,51.02,Within expected range
-626731,Murda,North Goa,Census Town,7517,41.56,43.49,-1.93,30.42,56.56,Within expected range
-626727,Jua,North Goa,Census Town,4134,34.61,36.2,-1.59,23.14,49.27,Within expected range
-626702,Salvador do Mundo,North Goa,Census Town,6373,36.2,37.03,-0.83,23.96,50.1,Within expected range
-627021,Sanvordem,South Goa,Census Town,5103,35.06,35.88,-0.82,22.82,48.95,Within expected range
-626690,Siolim,North Goa,Census Town,10936,37.57,38.38,-0.82,25.32,51.45,Within expected range
-626697,Candolim,North Goa,Census Town,8500,39.98,40.33,-0.35,27.26,53.39,Within expected range
-626732,Calapor,North Goa,Census Town,14077,41.96,42.12,-0.16,29.05,55.19,Within expected range
-626933,Chinchinim,South Goa,Census Town,6908,36.92,36.73,0.19,23.67,49.8,Within expected range
-626932,Varca,South Goa,Census Town,5439,36.57,35.98,0.59,22.92,49.05,Within expected range
-626729,Corlim,North Goa,Census Town,6568,40.89,40.19,0.7,27.12,53.26,Within expected range
-626925,Raia,South Goa,Census Town,10706,39.67,37.85,1.82,24.78,50.91,Within expected range
-803244,Bicholim,North Goa,Municipal Council,16986,53.3,51.23,2.07,38.17,64.3,Within expected range
-803252,Curchorem-Cacora,South Goa,Municipal Council,22730,48.14,46.04,2.1,32.98,59.11,Within expected range
-626872,Borim,North Goa,Census Town,8257,35.27,32.77,2.5,19.7,45.84,Within expected range
-803245,Sanquelim,North Goa,Municipal Council,13651,43.84,41.32,2.51,28.26,54.39,Within expected range
-626693,Guirim,North Goa,Census Town,5036,41.97,38.84,3.13,25.77,51.91,Within expected range
-626869,Bandora,North Goa,Census Town,12722,41.64,37.97,3.67,24.9,51.04,Within expected range
-803247,Ponda,North Goa,Municipal Council,22664,54.6,50.9,3.71,37.83,63.96,Within expected range
-626926,Curtorim,South Goa,Census Town,12886,40.5,36.72,3.78,23.66,49.79,Within expected range
-626691,Colvale,North Goa,Census Town,4818,39.79,35.21,4.58,22.15,48.28,Within expected range
-626868,Priol,North Goa,Census Town,8164,36.67,31.89,4.78,18.82,44.96,Within expected range
-626700,Pilerne,North Goa,Census Town,5827,43.52,38.47,5.05,25.4,51.54,Within expected range
-626704,Aldona,North Goa,Census Town,6270,42.63,36.98,5.65,23.91,50.05,Within expected range
-626924,Nuvem,South Goa,Census Town,9288,42.89,37.2,5.69,24.14,50.27,Within expected range
-803246,Valpoi,North Goa,Municipal Council,8532,44.33,38.31,6.03,25.24,51.37,Within expected range
-626931,Benaulim,South Goa,Census Town,11919,45.58,39.49,6.09,26.42,52.55,Within expected range
-626733,Bambolim,North Goa,Census Town,6885,48.0,41.9,6.1,28.83,54.97,Within expected range
-803242,Mapusa,North Goa,Municipal Council,39989,60.66,54.38,6.28,41.32,67.45,Within expected range
-626696,Saligao,North Goa,Census Town,6280,45.19,38.76,6.44,25.69,51.82,Within expected range
-626699,Reis Magos,North Goa,Census Town,8053,45.87,39.24,6.63,26.17,52.31,Within expected range
-626871,Quela,North Goa,Census Town,6852,43.03,35.91,7.12,22.84,48.97,Within expected range
-626701,Penha-de-Franca,North Goa,Census Town,15342,50.84,43.58,7.27,30.51,56.65,Within expected range
-626734,Goa Velha,North Goa,Census Town,4322,43.66,35.93,7.73,22.86,48.99,Within expected range
-626930,Navelim,South Goa,Census Town,12323,50.45,42.65,7.8,29.58,55.72,Within expected range
-803254,Canacona,South Goa,Municipal Council,12434,55.85,47.23,8.62,34.17,60.3,Within expected range
-803249,Margao,South Goa,Municipal Council,87650,67.02,56.9,10.12,43.84,69.97,Within expected range
-803241,Pernem,North Goa,Municipal Council,5021,58.66,47.8,10.85,34.74,60.87,Within expected range
-626929,Aquem,South Goa,Census Town,6511,59.84,40.96,18.88,27.89,54.02,Significantly over-performing
-626885,Chicalim,South Goa,Census Town,6933,57.48,37.54,19.94,24.47,50.6,Significantly over-performing
-626923,Verna,South Goa,Census Town,6632,55.5,33.2,22.3,20.13,46.27,Significantly over-performing
-803243,Panaji,North Goa,Municipal Corporation,70991,74.21,51.21,23.0,38.14,64.27,Significantly over-performing
+census_code,town,district,civic_status,population,infrascore,expected,gap,lower_90,upper_90,flag,statutory,q_mondrian,flag_mondrian
+803250,Cuncolim,South Goa,Municipal Council,16623,29.62,48.88,-19.26,35.81,61.95,Significantly under-served,1,23.0,within
+803251,Quepem,South Goa,Municipal Council,14795,30.65,47.55,-16.9,34.48,60.61,Significantly under-served,1,23.0,within
+626886,Sancoale,South Goa,Census Town,21923,28.26,43.45,-15.19,30.38,56.51,Significantly under-served,0,15.19,within
+626728,Cumbarjua,North Goa,Census Town,4917,30.93,43.47,-12.54,30.4,56.53,Within expected range,0,15.19,within
+626658,Arambol,North Goa,Census Town,5322,26.19,37.57,-11.37,24.5,50.63,Within expected range,0,15.19,within
+626735,Mercurim,North Goa,Census Town,4970,30.35,40.85,-10.5,27.78,53.92,Within expected range,0,15.19,within
+626660,Parcem,North Goa,Census Town,4627,26.4,36.62,-10.22,23.55,49.69,Within expected range,0,15.19,within
+626969,Xeldem,South Goa,Census Town,7434,25.53,35.68,-10.15,22.62,48.75,Within expected range,0,15.19,within
+803248,Mormugao,South Goa,Municipal Council,94393,50.4,60.44,-10.04,47.38,73.51,Within expected range,1,23.0,within
+626867,Marcaim,North Goa,Census Town,6215,23.32,33.13,-9.81,20.06,46.2,Within expected range,0,15.19,within
+626661,Morjim,North Goa,Census Town,6760,27.96,37.53,-9.57,24.46,50.6,Within expected range,0,15.19,within
+626865,Candola,North Goa,Census Town,5354,23.44,32.93,-9.49,19.86,46.0,Within expected range,0,15.19,within
+626927,Sao Jose de Areal,South Goa,Census Town,10229,30.45,39.6,-9.15,26.53,52.66,Within expected range,0,15.19,within
+626703,Socorro,North Goa,Census Town,12908,34.61,41.31,-6.7,28.25,54.38,Within expected range,0,15.19,within
+626842,Onda,North Goa,Census Town,5863,25.14,31.74,-6.6,18.67,44.8,Within expected range,0,15.19,within
+626698,Nerul,North Goa,Census Town,5042,29.74,36.13,-6.4,23.07,49.2,Within expected range,0,15.19,within
+626730,Chimbel,North Goa,Census Town,15289,41.08,46.73,-5.65,33.66,59.79,Within expected range,0,15.19,within
+626928,Davorlim,South Goa,Census Town,15350,39.28,44.47,-5.19,31.4,57.54,Within expected range,0,15.19,within
+626870,Curti,North Goa,Census Town,16385,35.52,40.69,-5.16,27.62,53.75,Within expected range,0,15.19,within
+626694,Anjuna,North Goa,Census Town,9636,33.91,38.79,-4.88,25.72,51.86,Within expected range,0,15.19,within
+626764,Pale,North Goa,Census Town,6043,23.95,28.81,-4.86,15.74,41.88,Within expected range,0,15.19,within
+626695,Calangute,North Goa,Census Town,13810,37.39,41.47,-4.08,28.4,54.54,Within expected range,0,15.19,within
+626887,Cortalim,South Goa,Census Town,9080,37.98,40.94,-2.96,27.87,54.0,Within expected range,0,15.19,within
+626659,Mandrem,North Goa,Census Town,8336,33.6,36.28,-2.68,23.22,49.35,Within expected range,0,15.19,within
+626763,Carapur,North Goa,Census Town,5500,27.64,30.13,-2.49,17.07,43.2,Within expected range,0,15.19,within
+626873,Usgao,North Goa,Census Town,12436,31.12,33.51,-2.39,20.44,46.57,Within expected range,0,15.19,within
+803253,Sanguem,South Goa,Municipal Council,6444,44.28,46.49,-2.21,33.42,59.55,Within expected range,1,23.0,within
+626692,Moira,North Goa,Census Town,4299,35.93,37.95,-2.02,24.88,51.02,Within expected range,0,15.19,within
+626731,Murda,North Goa,Census Town,7517,41.56,43.49,-1.93,30.42,56.56,Within expected range,0,15.19,within
+626727,Jua,North Goa,Census Town,4134,34.61,36.2,-1.59,23.14,49.27,Within expected range,0,15.19,within
+626702,Salvador do Mundo,North Goa,Census Town,6373,36.2,37.03,-0.83,23.96,50.1,Within expected range,0,15.19,within
+627021,Sanvordem,South Goa,Census Town,5103,35.06,35.88,-0.82,22.82,48.95,Within expected range,0,15.19,within
+626690,Siolim,North Goa,Census Town,10936,37.57,38.38,-0.82,25.32,51.45,Within expected range,0,15.19,within
+626697,Candolim,North Goa,Census Town,8500,39.98,40.33,-0.35,27.26,53.39,Within expected range,0,15.19,within
+626732,Calapor,North Goa,Census Town,14077,41.96,42.12,-0.16,29.05,55.19,Within expected range,0,15.19,within
+626933,Chinchinim,South Goa,Census Town,6908,36.92,36.73,0.19,23.67,49.8,Within expected range,0,15.19,within
+626932,Varca,South Goa,Census Town,5439,36.57,35.98,0.59,22.92,49.05,Within expected range,0,15.19,within
+626729,Corlim,North Goa,Census Town,6568,40.89,40.19,0.7,27.12,53.26,Within expected range,0,15.19,within
+626925,Raia,South Goa,Census Town,10706,39.67,37.85,1.82,24.78,50.91,Within expected range,0,15.19,within
+803244,Bicholim,North Goa,Municipal Council,16986,53.3,51.23,2.07,38.17,64.3,Within expected range,1,23.0,within
+803252,Curchorem-Cacora,South Goa,Municipal Council,22730,48.14,46.04,2.1,32.98,59.11,Within expected range,1,23.0,within
+626872,Borim,North Goa,Census Town,8257,35.27,32.77,2.5,19.7,45.84,Within expected range,0,15.19,within
+803245,Sanquelim,North Goa,Municipal Council,13651,43.84,41.32,2.51,28.26,54.39,Within expected range,1,23.0,within
+626693,Guirim,North Goa,Census Town,5036,41.97,38.84,3.13,25.77,51.91,Within expected range,0,15.19,within
+626869,Bandora,North Goa,Census Town,12722,41.64,37.97,3.67,24.9,51.04,Within expected range,0,15.19,within
+803247,Ponda,North Goa,Municipal Council,22664,54.6,50.9,3.71,37.83,63.96,Within expected range,1,23.0,within
+626926,Curtorim,South Goa,Census Town,12886,40.5,36.72,3.78,23.66,49.79,Within expected range,0,15.19,within
+626691,Colvale,North Goa,Census Town,4818,39.79,35.21,4.58,22.15,48.28,Within expected range,0,15.19,within
+626868,Priol,North Goa,Census Town,8164,36.67,31.89,4.78,18.82,44.96,Within expected range,0,15.19,within
+626700,Pilerne,North Goa,Census Town,5827,43.52,38.47,5.05,25.4,51.54,Within expected range,0,15.19,within
+626704,Aldona,North Goa,Census Town,6270,42.63,36.98,5.65,23.91,50.05,Within expected range,0,15.19,within
+626924,Nuvem,South Goa,Census Town,9288,42.89,37.2,5.69,24.14,50.27,Within expected range,0,15.19,within
+803246,Valpoi,North Goa,Municipal Council,8532,44.33,38.31,6.03,25.24,51.37,Within expected range,1,23.0,within
+626931,Benaulim,South Goa,Census Town,11919,45.58,39.49,6.09,26.42,52.55,Within expected range,0,15.19,within
+626733,Bambolim,North Goa,Census Town,6885,48.0,41.9,6.1,28.83,54.97,Within expected range,0,15.19,within
+803242,Mapusa,North Goa,Municipal Council,39989,60.66,54.38,6.28,41.32,67.45,Within expected range,1,23.0,within
+626696,Saligao,North Goa,Census Town,6280,45.19,38.76,6.44,25.69,51.82,Within expected range,0,15.19,within
+626699,Reis Magos,North Goa,Census Town,8053,45.87,39.24,6.63,26.17,52.31,Within expected range,0,15.19,within
+626871,Quela,North Goa,Census Town,6852,43.03,35.91,7.12,22.84,48.97,Within expected range,0,15.19,within
+626701,Penha-de-Franca,North Goa,Census Town,15342,50.84,43.58,7.27,30.51,56.65,Within expected range,0,15.19,within
+626734,Goa Velha,North Goa,Census Town,4322,43.66,35.93,7.73,22.86,48.99,Within expected range,0,15.19,within
+626930,Navelim,South Goa,Census Town,12323,50.45,42.65,7.8,29.58,55.72,Within expected range,0,15.19,within
+803254,Canacona,South Goa,Municipal Council,12434,55.85,47.23,8.62,34.17,60.3,Within expected range,1,23.0,within
+803249,Margao,South Goa,Municipal Council,87650,67.02,56.9,10.12,43.84,69.97,Within expected range,1,23.0,within
+803241,Pernem,North Goa,Municipal Council,5021,58.66,47.8,10.85,34.74,60.87,Within expected range,1,23.0,within
+626929,Aquem,South Goa,Census Town,6511,59.84,40.96,18.88,27.89,54.02,Significantly over-performing,0,15.19,above
+626885,Chicalim,South Goa,Census Town,6933,57.48,37.54,19.94,24.47,50.6,Significantly over-performing,0,15.19,above
+626923,Verna,South Goa,Census Town,6632,55.5,33.2,22.3,20.13,46.27,Significantly over-performing,0,15.19,above
+803243,Panaji,North Goa,Municipal Corporation,70991,74.21,51.21,23.0,38.14,64.27,Significantly over-performing,1,23.0,within

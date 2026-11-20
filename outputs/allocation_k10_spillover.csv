@@ -1,0 +1,9 @@
+spillover,strategy,pop_weighted_gain,mean_gain,towns_left_tier_E,gini_after,gain_in_bottom_quintile
+False,Greedy optimiser,0.7621,0.6034,2.0,0.1415,15.7682
+False,Lowest score first,0.396,0.7351,5.0,0.1295,50.7212
+False,Largest towns first,0.0508,0.007,0.0,0.147,-0.0
+False,Random (mean of 200),0.1883,0.2739,0.75,0.1454,5.0418
+True,Greedy optimiser,1.0995,1.4057,6.0,0.1309,39.0627
+True,Lowest score first,0.7819,1.3135,6.0,0.1264,54.8299
+True,Largest towns first,0.0508,0.007,0.0,0.147,-0.0
+True,Random (mean of 200),0.3364,0.5125,1.785,0.1431,10.6486
