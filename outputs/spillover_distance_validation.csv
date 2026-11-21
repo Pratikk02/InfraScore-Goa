@@ -1,0 +1,8 @@
+indicator,towns_with,towns_without,spearman,median_pred_km,median_census_km,share_pred_ge_census,median_abs_err_km
+acc_hospital_km,8,61,0.7296,9.0239,9.0,0.5574,2.0
+acc_fire_km,10,59,0.759,7.5291,8.0,0.661,1.9056
+acc_degree_college_km,13,56,0.5561,7.1769,6.0,0.6964,1.7409
+acc_library_km,40,29,0.4174,4.8214,7.0,0.3793,2.0727
+acc_auditorium_km,32,37,0.269,4.7661,8.0,0.4054,2.8224
+acc_stadium_km,13,56,0.6057,7.4183,10.5,0.375,2.7647
+acc_cinema_km,9,60,0.6474,9.2779,9.5,0.6,1.9253

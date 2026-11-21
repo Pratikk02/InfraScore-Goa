@@ -1,5 +1,14 @@
-town,facility types lacking in 2011,post-2011 evidence (same search protocol)
-Jua,"Hospital, Fire station",none found
-Bandora,"Hospital, Fire station",none found
-Onda,"Hospital, Fire station",none found
-Ponda,none (ineligible),not applicable
+town,stage,facility types lacking in 2011,match,post-2011 evidence (same search protocol),source
+Jua,1,"Hospital, Fire station",none,none found,
+Bandora,1,"Hospital, Fire station",none,none found,
+Onda,1,"Hospital, Fire station",none,none found,
+Ponda,1,none (ineligible),not applicable,had both facility types in 2011,
+Xeldem,2,"Hospital, Fire station",none,none found,
+Goa Velha,2,"Hospital, Fire station",none,none found,
+Anjuna,2,"Hospital, Fire station",none,Fire: editorial notes reliance on Mapusa station (45 min) but no proposal or demand for a station,"thegoan.net (editorial, Apr 2026)"
+Nuvem,2,"Hospital, Fire station",none,none found,
+Mandrem,2,"Hospital, Fire station",none,none found,
+Benaulim,2,"Hospital, Fire station",related,Hospital: proposed primary health centre opposed at a special gram sabha,heraldgoa.in/goa/commotion-over-proposed-health-centre-at-benaulim/151356
+Chicalim,2,Fire station,none,none found,
+Siolim,2,"Hospital, Fire station",exact,Hospital: health minister announced upgrade of the PHC to a community health centre with casualty (Jan 2024),thegoan.net/goa-news/siolim-phc-to-be-upgraded-to-chc/108514.html
+Sanguem,2,"Hospital, Fire station",exact,Hospital: new sub-district hospital with dialysis unit to open (Feb 2026); fire: residents' demand for a fire station,medicaldialogues.in/.../164502; heraldgoa.in/goa/.../173855

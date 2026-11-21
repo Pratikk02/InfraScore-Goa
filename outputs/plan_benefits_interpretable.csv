@@ -1,0 +1,6 @@
+,hospital_residents_newly_within_5km,hospital_popwtd_km_before,hospital_popwtd_km_after,fire_residents_newly_within_5km,fire_popwtd_km_before,fire_popwtd_km_after
+"A: greedy, no spillover",102158.0,7.615,5.514,65777.0,4.597,3.793
+"A: greedy, spillover",85421.0,7.615,5.051,136009.0,4.597,2.736
+"A: lowest-first, spillover",81838.0,7.615,4.278,62882.0,4.597,3.633
+B: cost-aware Rs 250 cr,35267.0,7.615,6.418,54258.0,4.597,3.893
+B: essential Rs 250 cr,35267.0,7.615,6.418,80290.0,4.597,3.568

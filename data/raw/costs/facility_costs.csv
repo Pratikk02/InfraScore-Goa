@@ -1,8 +1,8 @@
 facility,capex_cr,capex_source,opex_cr_per_yr,opex_basis
 Primary health centre,19.0,"Porvorim 32-bed PHC, 'over Rs 19 crore' (Navhind Times, 3 Apr 2026); cross-check: Candolim PHC Rs 17.65 cr (GSIDC)",1.71441,PHC mean annual cost Rs 0.886 cr at 2012-13 prices (Prinja et al. 2016) x CPI 1.935
 Hospital,30.0,"120-bed Sub-District Hospital Chicalim, Rs 30 cr (Herald Goa)",5.209020000000001,CHC mean annual cost Rs 2.69 cr at 2012-13 prices (Prinja et al. 2016) x CPI 1.935
-Fire station,10.83,"Modern Valpoi fire station, Rs 10.83 cr (DFES, Feb 2026)",5.403823529411764,"DFES revenue budget 2025-26 Rs 91.87 cr / 17 stations (Goa Budget Vol. III, Demand 26)"
-Degree college,25.54,"Govt College Quepem, three new blocks + hall, est. Rs 25.54 cr (GSIDC, 2013-15)",3.0,assumption (no published per-college figure)
-Stadium,28.0,"Canacona indoor stadium, Rs 28 cr (The Goan, 13 May 2026)",0.5,assumption
-Auditorium / community hall,2.48,"Multipurpose hall with indoor games, VP Nagoa, est. Rs 2.48 cr (GSIDC, 2023)",0.05,assumption
-Public library,0.377,"Digital panchayat library ceiling Rs 37.72 lakh each (ITG tender, Navhind Times)",0.05,assumption
+Fire station,10.83,"Modern Valpoi fire station, Rs 10.83 cr (DFES, Feb 2026)",5.403823529411764,"DFES revenue budget 2025-26 Rs 91.87 cr / 17 units: 16 fire stations and the headquarters (Goa Budget Vol. III, Demand 26)"
+Degree college,25.54,"Govt College Quepem, three new blocks + hall, est. Rs 25.54 cr (GSIDC, 2013-15)",13.954,"Goa Budget 2025-26 Vol. II, Demand 35, head 2202-03-103-01 'Government College' Rs 9,767.75 lakh / 7 government colleges (DHE list)"
+Stadium,28.0,"Canacona indoor stadium, Rs 28 cr (The Goan, 13 May 2026)",1.0,SAG: 'around Rs one crore' a year on maintenance of the Campal indoor stadium (Herald Goa)
+Auditorium / community hall,2.48,"Multipurpose hall with indoor games, VP Nagoa, est. Rs 2.48 cr (GSIDC, 2023)",0.05,assumption (no published Goa figure)
+Public library,0.377,"Digital panchayat library ceiling Rs 37.72 lakh each (ITG tender, Navhind Times)",0.286,"Directorate of Art & Culture Performance Budget 2025-26: Govt village libraries, 2024-25 expenditure Rs 114.43 lakh / 4 libraries"

@@ -1,30 +1,26 @@
 step,town,action,cost_cr,own_gain,towns_improved
-1,Cuncolim,Public library,0.713,1.398,1
-2,Usgao,Public library,0.713,1.398,1
-3,Marcaim,Public library,0.713,1.596,4
-4,Carapur,Public library,0.713,1.729,2
-5,Socorro,Public library,0.713,0.902,2
-6,Raia,Public library,0.713,1.007,1
-7,Sancoale,Auditorium / community hall,2.816,1.101,4
-8,Davorlim,Public library,0.713,0.518,2
-9,Bambolim,Public library,0.713,0.902,3
-10,Navelim,Public library,0.713,0.518,2
-11,Cuncolim,Auditorium / community hall,2.816,1.398,2
-12,Calangute,Auditorium / community hall,2.816,1.264,4
-13,Quepem,Auditorium / community hall,2.816,1.101,2
-14,Calapor,Auditorium / community hall,2.816,0.787,6
-15,Onda,Auditorium / community hall,2.816,1.939,2
-16,Socorro,Auditorium / community hall,2.816,1.007,1
-17,Priol,Auditorium / community hall,2.816,1.187,2
-18,Chimbel,Auditorium / community hall,2.816,0.659,2
-19,Anjuna,Auditorium / community hall,2.816,0.885,2
-20,Curti,Stadium,31.355,1.94,13
-21,Sancoale,Fire station,47.09,3.671,5
-22,Sanvordem,Public library,0.713,0.363,1
-23,Marcaim,Auditorium / community hall,2.816,0.96,1
-24,Siolim,Auditorium / community hall,2.816,0.363,3
-25,Cuncolim,Fire station,47.09,5.449,2
-26,Curchorem-Cacora,Hospital,64.953,4.316,6
-27,Cortalim,Auditorium / community hall,2.816,0.646,1
-28,Sanguem,Auditorium / community hall,2.816,0.902,1
-29,Bambolim,Auditorium / community hall,2.816,0.186,3
+1,Sancoale,Auditorium / community hall,2.816,1.101,4
+2,Cuncolim,Public library,2.296,1.398,1
+3,Cuncolim,Auditorium / community hall,2.816,1.398,2
+4,Calangute,Auditorium / community hall,2.816,1.264,4
+5,Usgao,Public library,2.296,1.398,1
+6,Quepem,Auditorium / community hall,2.816,1.101,2
+7,Marcaim,Public library,2.296,1.596,4
+8,Calapor,Auditorium / community hall,2.816,0.787,6
+9,Carapur,Public library,2.296,1.729,2
+10,Socorro,Public library,2.296,0.902,2
+11,Onda,Auditorium / community hall,2.816,1.939,2
+12,Socorro,Auditorium / community hall,2.816,1.007,1
+13,Raia,Public library,2.296,1.007,1
+14,Priol,Auditorium / community hall,2.816,1.187,2
+15,Davorlim,Public library,2.296,0.518,2
+16,Chimbel,Auditorium / community hall,2.816,0.659,2
+17,Bambolim,Public library,2.296,0.902,3
+18,Anjuna,Auditorium / community hall,2.816,0.885,2
+19,Navelim,Public library,2.296,0.518,2
+20,Sancoale,Fire station,47.09,3.671,5
+21,Curti,Stadium,34.71,1.94,13
+22,Marcaim,Auditorium / community hall,2.816,0.96,1
+23,Siolim,Auditorium / community hall,2.816,0.363,3
+24,Cuncolim,Fire station,47.09,5.449,2
+25,Curchorem-Cacora,Hospital,64.953,4.316,6

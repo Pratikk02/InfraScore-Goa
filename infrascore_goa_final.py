@@ -1190,7 +1190,7 @@ savefig(fig, "fig10_district_benchmark.png")
 
 # ### 10b. Real-world corroboration after 2011
 # 
-# The model only sees 2011 data. A strong test is whether the towns and facilities it prioritises were later the subject of government action or documented public demand. We searched news and government sources for each town in the greedy K = 10 plan (Section 9), and applied the same search protocol to four **randomly drawn control towns** that are not in the plan. Samples are small, so the comparison is descriptive.
+# The model only sees 2011 data. A strong test is whether the towns and facilities it prioritises were later the subject of government action or documented public demand. We searched news and government sources for each town in the greedy K = 10 plan (Section 9), and applied the same search protocol to **randomly drawn control towns** that are not in the plan (four in V1, enlarged to thirteen in V2, of which twelve lacked a hospital or fire station in 2011). Samples remain small, and news coverage is uneven across towns, so the test is limited corroboration rather than proof.
 
 # In[20]:
 
@@ -1232,26 +1232,51 @@ print(f"Towns with exact evidence: {len(exact_towns)} of {len(towns_plan)}; with
       f"{len(any_towns)} of {len(towns_plan)} (not searched: {', '.join(sorted(set(towns_plan) - searched)) or 'none'})")
 EVIDENCE.to_csv(OUT / "post2011_evidence.csv", index=False)
 
-# ---- control comparison: four towns drawn at random (seed 42) from towns NOT in the plan.
-# The same search protocol is applied to the hospital / fire station types each town lacked in 2011.
+# ---- control comparison. Stage 1: four towns drawn at random (seed 42) from towns NOT in the plan.
+# Stage 2 (added in V2 to give the test some power): the remaining non-plan towns are shuffled (seed 43) and the
+# first nine that lacked a hospital or a fire station in 2011 are added. Each control is searched with the same
+# protocol as the plan towns ("<town> Goa hospital / health centre", "<town> Goa fire station"; news and
+# government sources) for the facility types it lacked in 2011, and coded with the same exact / related rule.
 pool = sorted(set(R.town) - set(towns_plan))
 controls = list(np.random.default_rng(SEED).choice(pool, 4, replace=False))
-lack = F.set_index("town").loc[controls, ["acc_hospital_km", "acc_fire_km"]] > 0
+lack_all = F.set_index("town")[["acc_hospital_km", "acc_fire_km"]] > 0
+rest = [t for t in pool if t not in controls]
+extra = [t for t in np.random.default_rng(SEED + 1).permutation(rest) if lack_all.loc[t].any()][:9]
+controls = controls + extra
+lack = lack_all.loc[controls]
 CONTROL = pd.DataFrame({
     "town": controls,
+    "stage": [1] * 4 + [2] * len(extra),
     "facility types lacking in 2011": [", ".join(n for n, flag in zip(["Hospital", "Fire station"], row) if flag) or "none (ineligible)"
                                         for row in lack.values],
 })
-CONTROL_FOUND = {"Jua": "none found", "Bandora": "none found", "Onda": "none found", "Ponda": "not applicable"}
-CONTROL["post-2011 evidence (same search protocol)"] = CONTROL.town.map(CONTROL_FOUND).fillna("not searched")
+# (match, evidence, source); towns not listed: nothing found for the facility types they lacked
+CONTROL_FOUND = {
+    "Ponda": ("not applicable", "had both facility types in 2011", ""),
+    "Siolim": ("exact", "Hospital: health minister announced upgrade of the PHC to a community health centre with casualty (Jan 2024)",
+               "thegoan.net/goa-news/siolim-phc-to-be-upgraded-to-chc/108514.html"),
+    "Sanguem": ("exact", "Hospital: new sub-district hospital with dialysis unit to open (Feb 2026); fire: residents' demand for a fire station",
+                "medicaldialogues.in/.../164502; heraldgoa.in/goa/.../173855"),
+    "Benaulim": ("related", "Hospital: proposed primary health centre opposed at a special gram sabha",
+                 "heraldgoa.in/goa/commotion-over-proposed-health-centre-at-benaulim/151356"),
+    "Anjuna": ("none", "Fire: editorial notes reliance on Mapusa station (45 min) but no proposal or demand for a station",
+               "thegoan.net (editorial, Apr 2026)"),
+}
+CONTROL["match"] = [CONTROL_FOUND.get(t, ("none",))[0] for t in CONTROL.town]
+CONTROL["post-2011 evidence (same search protocol)"] = [CONTROL_FOUND.get(t, (None, "none found"))[1] for t in CONTROL.town]
+CONTROL["source"] = [CONTROL_FOUND.get(t, (None, None, ""))[2] for t in CONTROL.town]
 display(Markdown("**Randomly drawn control towns (not in the plan)**")); display(CONTROL)
 eligible = CONTROL[~CONTROL["facility types lacking in 2011"].str.startswith("none")]
-ctrl_hits = (eligible["post-2011 evidence (same search protocol)"] != "none found").sum()
+ctrl_hits = (eligible["match"] == "exact").sum()
+ctrl_any = eligible["match"].isin(["exact", "related"]).sum()
 plan_hits = len(exact_towns)
 from scipy.stats import fisher_exact
 FISHER = fisher_exact([[plan_hits, len(towns_plan) - plan_hits], [ctrl_hits, len(eligible) - ctrl_hits]], alternative="greater")
+FISHER_ANY = fisher_exact([[len(any_towns), len(towns_plan) - len(any_towns)], [ctrl_any, len(eligible) - ctrl_any]], alternative="greater")
 print(f"Exact evidence: plan towns {plan_hits}/{len(towns_plan)} vs eligible control towns {ctrl_hits}/{len(eligible)} "
-      f"(one-sided Fisher exact p = {FISHER.pvalue:.2f}; small samples, descriptive only)")
+      f"(one-sided Fisher exact p = {FISHER.pvalue:.3f})")
+print(f"Exact or related: plan towns {len(any_towns)}/{len(towns_plan)} vs controls {ctrl_any}/{len(eligible)} "
+      f"(p = {FISHER_ANY.pvalue:.3f})")
 CONTROL.to_csv(OUT / "post2011_controls.csv", index=False)
 
 
@@ -1401,18 +1426,29 @@ def draw_goa(ax):
 
 gap_by_code = GAP.set_index("census_code")
 FLAG_UNDER = TC.census_code.map(gap_by_code.flag).eq("Significantly under-served").values
-fig, axes = plt.subplots(1, 3, figsize=(COL2, 3.6), gridspec_kw={"width_ratios": [1, 1, 1.25]})
+fig, axes = plt.subplots(1, 3, figsize=(COL2, 3.8), gridspec_kw={"width_ratios": [1, 1, 1.25]})
 ax = axes[0]
 draw_goa(ax)
 sc = ax.scatter(LON, LAT, c=IS0, cmap="RdYlGn", vmin=20, vmax=75, s=6 + F.population / 2500, ec="#333333", lw=0.3, zorder=3)
 ax.scatter(LON[FLAG_UNDER], LAT[FLAG_UNDER], s=70, facecolors="none", ec="#b2182b", lw=1.2, zorder=4)
 ax.scatter([orgao.lon], [orgao.lat], marker="x", s=18, color="#555555", lw=0.8, zorder=4)
-lab = list(np.where(FLAG_UNDER)[0]) + list(F.index[F.town.isin(["Panaji", "Margao", "Mapusa"])])
-label_points(ax, LON[lab], LAT[lab], F.town.values[lab].tolist(), fontsize=5.6,
-             sides=["l" if F.town.values[k] in ("Panaji", "Mapusa") else "r" for k in lab])
-ax.annotate("Orgao (no record)", (orgao.lon, orgao.lat), xytext=(10, 14), textcoords="offset points", fontsize=5.2, color="#555555",
-            arrowprops=dict(arrowstyle="-", color="#8a8a8a", lw=0.5))
-cb = fig.colorbar(sc, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02); cb.ax.tick_params(labelsize=5.5)
+
+
+def put(ax, x, y, text, dx, dy, color="#222222", size=6.2):
+    """Label a point at a fixed offset (points) with a thin leader line and a white halo, so labels never sit on markers."""
+    ax.annotate(text, (x, y), xytext=(dx, dy), textcoords="offset points", fontsize=size, color=color,
+                ha="right" if dx < 0 else "left", va="center", zorder=6,
+                bbox=dict(boxstyle="round,pad=0.12", fc="white", ec="none", alpha=0.85),
+                arrowprops=dict(arrowstyle="-", color="#777777", lw=0.5, shrinkA=0, shrinkB=2))
+
+
+MAP_OFFSETS = {"Mapusa": (-16, 6), "Panaji": (-18, -2), "Sancoale": (-18, -12), "Margao": (-22, -8),
+               "Quepem": (16, 8), "Cuncolim": (16, -10)}
+for name, (dx, dy) in MAP_OFFSETS.items():
+    k = F.index[F.town == name][0]
+    put(ax, LON[k], LAT[k], name, dx, dy, color="#b2182b" if FLAG_UNDER[k] else "#222222")
+put(ax, orgao.lon, orgao.lat, "Orgao (no record)", 14, 16, color="#555555", size=5.8)
+cb = fig.colorbar(sc, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02); cb.ax.tick_params(labelsize=6)
 cb.set_label("InfraScore (2011)", fontsize=6); cb.outline.set_visible(False)
 ax.set_title("(a) 2011 InfraScore (ring = flagged)", fontsize=7)
 
@@ -1420,13 +1456,14 @@ ax = axes[1]
 draw_goa(ax)
 sc2 = ax.scatter(LON, LAT, c=NOW.inpatient_now, cmap="YlOrRd", vmin=0, vmax=15, s=10, ec="#333333", lw=0.3, zorder=3)
 h = HOSP_NOW
-ax.scatter(h.lon, h.lat, marker="P", s=26, color="#1f3b73", ec="white", lw=0.4, zorder=5, label="Hospital/CHC (>=30 beds)")
+ax.scatter(h.lon, h.lat, marker="P", s=26, color="#1f3b73", ec="white", lw=0.4, zorder=5, label="Hospital / CHC, 30+ beds")
 p = INPT_NOW[INPT_NOW.functional_beds.fillna(999) < 30]
 ax.scatter(p.lon, p.lat, marker="+", s=16, color="#1f3b73", lw=0.7, zorder=5, label="Bedded PHC")
 ax.scatter(FIRE_NOW.lon, FIRE_NOW.lat, marker="^", s=14, color="#c8553d", ec="white", lw=0.3, zorder=5, label="Fire station")
-cb2 = fig.colorbar(sc2, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02); cb2.ax.tick_params(labelsize=5.5)
+cb2 = fig.colorbar(sc2, ax=ax, orientation="horizontal", fraction=0.04, pad=0.02); cb2.ax.tick_params(labelsize=6)
 cb2.set_label("km to public inpatient care (now)", fontsize=6); cb2.outline.set_visible(False)
-ax.legend(loc="lower left", fontsize=5, handletextpad=0.2, borderaxespad=0.1, labelspacing=0.25, markerscale=0.8)
+ax.legend(loc="lower left", fontsize=5.2, handletextpad=0.2, borderaxespad=0.0, labelspacing=0.3, markerscale=0.8,
+          frameon=True, framealpha=0.95, facecolor="white", edgecolor="#d0d4d9", borderpad=0.35)
 ax.set_title("(b) Contemporary public facilities", fontsize=7)
 
 ax = axes[2]
@@ -1437,8 +1474,11 @@ ax.fill_between(xx, xx - q90, xx + q90, color="#eef1f4", zorder=1)
 ax.plot(xx, xx, "--", color="#999999", lw=0.8, zorder=2)
 ax.scatter(GAP.expected, GAP.infrascore, c=GAP.flag.map(FLAG_COL2), s=12, ec="white", lw=0.3, zorder=3)
 labg = GAP[GAP.flag != "Within expected range"]
-label_points(ax, labg.expected.values, labg.infrascore.values, labg.town.tolist(), fontsize=5.6,
-             sides=["l" if f == "Significantly over-performing" else "r" for f in labg.flag])
+GAP_OFFSETS = {"Panaji": (-12, 0), "Aquem": (-14, 6), "Chicalim": (-16, 4), "Verna": (-14, -2),
+               "Quepem": (14, 12), "Cuncolim": (16, -2), "Sancoale": (14, -12)}
+for _, r_ in labg.iterrows():
+    dx, dy = GAP_OFFSETS.get(r_.town, (12, 0) if r_.flag == "Significantly under-served" else (-12, 0))
+    put(ax, r_.expected, r_.infrascore, r_.town, dx, dy, color=FLAG_COL2[r_.flag])
 ax.set_xlim(lo_, hi_); ax.set_ylim(lo_, hi_); ax.set_aspect("equal", adjustable="box")
 ax.set_xlabel("Expected (out-of-fold)", fontsize=6.5); ax.set_ylabel("Actual InfraScore", fontsize=6.5)
 ax.tick_params(labelsize=6)
@@ -1542,7 +1582,7 @@ display(MORAN.round(3))
 # 
 # **Spillovers.** A new hospital, fire station, library, hall, college or stadium in town *i* also shortens the access distance of every other town *j* to `min(current_j, circuity x straight-line(i, j))`. Per-capita indicators change only in the receiving town. Because InfraScore is linear in the indicator scores, the gain of every candidate action for every town is computed in closed form.
 # 
-# **Costs.** Capital costs are recent Goa project figures; operating costs come from a published costing study (health, uprated with the CPI), the DFES budget (fire) or are stated assumptions (college, stadium, hall, library). Lifecycle cost = capital + 10 years of operating cost discounted at 8%. Bank branches are excluded because they are private investments. A 200-draw Monte Carlo perturbs every capital and operating cost independently (log-normal, sigma = 0.4).
+# **Costs.** Capital costs are recent Goa project figures; operating costs come from a published costing study (health, uprated with the CPI), the Goa budget (fire stations: DFES revenue budget per station; colleges: the government-college budget head per college), a Sports Authority of Goa statement (stadium) and the Art & Culture performance budget (village libraries); only the community-hall figure is an assumption. Lifecycle cost = capital + 10 years of operating cost discounted at 8%. Bank branches are excluded because they are private investments. A 200-draw Monte Carlo perturbs every capital and operating cost independently (log-normal, sigma = 0.4).
 
 # In[25]:
 
@@ -1601,8 +1641,12 @@ def feasible_mask(a, S):
     return np.ones(len(F), bool)
 
 
+NO_SPILL = set()   # facility types whose spillovers are switched off (sensitivity analysis)
+
+
 def action_deltas(a, S, spill):
     """Matrix (site i x town j) of score gains if action a is placed at site i."""
+    spill = spill and a not in NO_SPILL
     n = len(F)
     dmat = np.zeros((n, n))
     if a in ACCESS_OF:
@@ -1616,6 +1660,7 @@ def action_deltas(a, S, spill):
 
 
 def apply_action(a, i, S, spill):
+    spill = spill and a not in NO_SPILL
     S = S.copy()
     if a in ACCESS_OF:
         k = IDX[ACCESS_OF[a]]
@@ -1767,7 +1812,49 @@ print(f"Monte Carlo ({time.time() - t:.0f}s): cost-aware greedy beats", {k: f"{v
       "| mean gains", MC_REAL.mean().round(3).to_dict())
 
 
+# #### Does the cost result depend on the weakest spillovers?
+# 
+# The census supports the spillover rule well for hospitals and fire stations but poorly for libraries and halls (Spearman 0.42 and 0.27), and halls and libraries make up most of the cost-aware plan. We therefore rerun Experiment B with hall and library spillovers switched off (each benefits only its own town), including the 200-draw cost Monte Carlo, and, separately, with the one assumed operating cost (community hall) raised tenfold.
+
 # In[28]:
+
+
+NO_SPILL = {"Auditorium / community hall", "Public library"}
+try:
+    ns = {}
+    for strat, lab_ in [("greedy_cost", "Cost-aware greedy"), ("greedy", "Greedy (ignores cost)"), ("lowest_first", "Lowest score first")]:
+        cur, plan = allocate(strat, PUBLIC_ACTIONS, cost=LC, budget=250, spill=True)
+        ns[lab_] = {"n_facilities": len(plan), "halls_libraries": int(plan.action.isin(NO_SPILL).sum()), **metrics(cur)}
+        if strat == "greedy_cost":
+            PLAN250_NOSPILL = plan
+    rr = [allocate("random", PUBLIC_ACTIONS, cost=LC, budget=250, spill=True, seed=s) for s in range(30)]
+    ns["Random (mean of 30)"] = {"n_facilities": np.mean([len(p) for _, p in rr]), **pd.DataFrame([metrics(c) for c, _ in rr]).mean().to_dict()}
+    rng_ns = np.random.default_rng(SEED)
+    mc_ns = []
+    for d in range(200):
+        f_cap = {a: float(np.exp(rng_ns.normal(0, 0.4))) for a in PUBLIC_ACTIONS}
+        f_op = {a: float(np.exp(rng_ns.normal(0, 0.4))) for a in PUBLIC_ACTIONS}
+        lc = {a: COSTS.loc[a, "capex_cr"] * f_cap[a] + COSTS.loc[a, "opex_cr_per_yr"] * f_op[a] * ANNUITY for a in PUBLIC_ACTIONS}
+        mc_ns.append({lab_: metrics(allocate(strat, PUBLIC_ACTIONS, cost=lc, budget=250, spill=True, seed=d)[0])["pop_weighted_gain"]
+                      for strat, lab_ in [("greedy_cost", "Cost-aware greedy"), ("greedy", "Greedy (ignores cost)"),
+                                          ("lowest_first", "Lowest score first"), ("random", "Random")]})
+finally:
+    NO_SPILL = set()
+NOSPILL_TAB = pd.DataFrame(ns).T
+MC_NS = pd.DataFrame(mc_ns)
+WIN_NS = {k: float((MC_NS["Cost-aware greedy"] > MC_NS[k]).mean()) for k in MC_NS.columns if k != "Cost-aware greedy"}
+display(NOSPILL_TAB.round(3)); display(PLAN250_NOSPILL.round(2))
+print("Hall and library spillovers off: cost-aware beats", {k: f"{v:.0%}" for k, v in WIN_NS.items()})
+
+lc_hall = dict(LC); lc_hall["Auditorium / community hall"] = COSTS.loc["Auditorium / community hall", "capex_cr"] + 10 * COSTS.loc["Auditorium / community hall", "opex_cr_per_yr"] * ANNUITY
+HALL10 = {lab_: metrics(allocate(strat, PUBLIC_ACTIONS, cost=lc_hall, budget=250, spill=True)[0])["pop_weighted_gain"]
+          for strat, lab_ in [("greedy_cost", "Cost-aware greedy"), ("greedy", "Greedy (ignores cost)")]}
+print(f"Hall operating cost x10 (lifecycle Rs {lc_hall['Auditorium / community hall']:.1f} cr): cost-aware {HALL10['Cost-aware greedy']:.2f} vs cost-blind {HALL10['Greedy (ignores cost)']:.2f}")
+NOSPILL_TAB.round(4).to_csv(OUT / "allocation_no_hall_library_spillover.csv")
+pd.DataFrame([{"test": "hall opex x10", **HALL10}, {"test": "no hall/library spillover, MC win share", **WIN_NS}]).round(4).to_csv(OUT / "cost_sensitivity_extra.csv", index=False)
+
+
+# In[29]:
 
 
 COVERAGE.to_csv(OUT / "coverage_audit.csv")
@@ -1786,9 +1873,168 @@ GAP[["town", "civic_status", "gap", "q_mondrian", "flag_mondrian"]].round(3).to_
 MC_REAL.round(4).to_csv(OUT / "realistic_cost_scenarios.csv", index=False)
 
 
+# ### 11e. Validating the spillover distance model, interpretable benefits, and sensitivity
+# 
+# **Validation.** The spillover rule assumes that a town without a facility reaches the nearest town that has one at about `1.40 x straight-line` km. The census independently reports each town's distance to its nearest facility, so the rule can be tested directly. Because the nearest facility may sit in a village (outside the 69-town set), the model distance should behave as an upper bound.
+# 
+# **Interpretable benefits.** Index points are translated into residents brought within 5 km of a hospital or fire station and into the population-weighted reduction in travel distance.
+# 
+# **Sensitivity.** The spillover and cost results are recomputed with the circuity factor at its interquartile bounds and with alternative discount rates and horizons.
+
+# In[30]:
+
+
+VAL_ROWS = []
+for c in ["acc_hospital_km", "acc_fire_km", "acc_degree_college_km", "acc_library_km", "acc_auditorium_km", "acc_stadium_km", "acc_cinema_km"]:
+    has = F[c].values == 0
+    if has.sum() < 3:
+        continue
+    obs = F[c].values[~has]
+    pred = (CIRC * DMAT[~has][:, has]).min(axis=1)
+    VAL_ROWS.append({"indicator": c, "towns_with": int(has.sum()), "towns_without": int((~has).sum()),
+                     "spearman": spearmanr(pred, obs).statistic, "median_pred_km": np.median(pred), "median_census_km": np.median(obs),
+                     "share_pred_ge_census": float(np.mean(pred >= obs - 0.5)), "median_abs_err_km": float(np.median(np.abs(pred - obs)))})
+SPILL_VAL = pd.DataFrame(VAL_ROWS)
+display(SPILL_VAL.round(3))
+print(f"Spillover distance model vs census nearest-facility distance: median Spearman {SPILL_VAL.spearman.median():.2f} "
+      f"(range {SPILL_VAL.spearman.min():.2f}-{SPILL_VAL.spearman.max():.2f}); model >= census in "
+      f"{np.average(SPILL_VAL.share_pred_ge_census, weights=SPILL_VAL.towns_without):.0%} of town-facility pairs")
+
+
+def replay(plan, spill=True, start=None):
+    S = (S0_STATE if start is None else start).copy()
+    for _, row in plan.iterrows():
+        S = apply_action(row.action, int(F.index[F.town == row.town][0]), S, spill)
+    return S
+
+
+def access_summary(S_before, S_after):
+    out = {}
+    for lab, c in [("hospital", "acc_hospital_km"), ("fire", "acc_fire_km")]:
+        k = IDX[c]
+        out[f"{lab}_residents_newly_within_5km"] = int(POPV[(S_after[:, k] <= 5) & (S_before[:, k] > 5)].sum())
+        out[f"{lab}_popwtd_km_before"] = np.average(S_before[:, k], weights=POPV)
+        out[f"{lab}_popwtd_km_after"] = np.average(S_after[:, k], weights=POPV)
+    return out
+
+
+PLAN_SET = {
+    "A: greedy, no spillover": (SPILL_PLANS[("Greedy optimiser", False)], False),
+    "A: greedy, spillover": (SPILL_PLANS[("Greedy optimiser", True)], True),
+    "A: lowest-first, spillover": (SPILL_PLANS[("Lowest score first", True)], True),
+    "B: cost-aware Rs 250 cr": (PLAN250, True),
+    "B: essential Rs 250 cr": (PLAN250_ESS, True),
+}
+BENEFIT = pd.DataFrame({k: access_summary(S0_STATE, replay(p, sp)) for k, (p, sp) in PLAN_SET.items()}).T
+display(BENEFIT.round(2))
+
+# --- sensitivity: circuity at its IQR bounds; discount rate and horizon for lifecycle costs
+REACH_BASE = REACH.copy()
+SENS_ROWS = []
+base_A = set(SPILL_PLANS[("Greedy optimiser", True)].town)
+base_B = set(PLAN250_ESS.town + "|" + PLAN250_ESS.action)
+jac = lambda a, b: len(a & b) / len(a | b)
+for circ in (1.26, CIRC, 1.60):
+    REACH = circ * DMAT; np.fill_diagonal(REACH, 0.0)
+    curA, pA = allocate("greedy", ACTIONS, K=10, spill=True)
+    rndA = np.mean([metrics(allocate("random", ACTIONS, K=10, spill=True, seed=s)[0])["pop_weighted_gain"] for s in range(50)])
+    curB, pB = allocate("greedy_cost", PUBLIC_ACTIONS, cost=LC, budget=250, spill=True)
+    curE, pE = allocate("greedy_cost", ESSENTIAL, cost=LC, budget=250, spill=True)
+    SENS_ROWS.append({"setting": f"circuity {circ:.2f}", "A_gain": metrics(curA)["pop_weighted_gain"], "A_ratio_vs_random": metrics(curA)["pop_weighted_gain"] / rndA,
+                      "A_jaccard_towns": jac(set(pA.town), base_A), "B_gain": metrics(curB)["pop_weighted_gain"],
+                      "essential_jaccard": jac(set(pE.town + "|" + pE.action), base_B)})
+REACH = REACH_BASE
+for r_, yrs in [(0.05, 10), (0.10, 10), (0.08, 15)]:
+    ann = (1 - (1 + r_) ** -yrs) / r_
+    lc = (COSTS.capex_cr + COSTS.opex_cr_per_yr * ann).to_dict()
+    curB, pB = allocate("greedy_cost", PUBLIC_ACTIONS, cost=lc, budget=250, spill=True)
+    curE, pE = allocate("greedy_cost", ESSENTIAL, cost=lc, budget=250, spill=True)
+    curBb, _ = allocate("greedy", PUBLIC_ACTIONS, cost=lc, budget=250, spill=True)
+    SENS_ROWS.append({"setting": f"discount {r_:.0%}, {yrs} yr", "A_gain": np.nan, "A_ratio_vs_random": np.nan, "A_jaccard_towns": np.nan,
+                      "B_gain": metrics(curB)["pop_weighted_gain"], "B_cost_blind_gain": metrics(curBb)["pop_weighted_gain"],
+                      "essential_jaccard": jac(set(pE.town + "|" + pE.action), base_B)})
+SENSITIVITY = pd.DataFrame(SENS_ROWS)
+display(SENSITIVITY.round(3))
+CORE = {"Sancoale|Fire station", "Curchorem-Cacora|Hospital"}
+SPILL_VAL.round(4).to_csv(OUT / "spillover_distance_validation.csv", index=False)
+BENEFIT.round(3).to_csv(OUT / "plan_benefits_interpretable.csv")
+SENSITIVITY.round(4).to_csv(OUT / "sensitivity_circuity_discount.csv", index=False)
+
+
+# #### Do the plans depend on the pillar weights?
+# 
+# The allocator maximises InfraScore, whose pillar weights are a judgement. Section 6 showed that the town *ranking* is stable under alternative weights; here we test the *plans*. We redraw the six pillar weights 400 times (200 flat Dirichlet(1) draws, which allow extreme weightings, and 200 draws centred on the baseline weights, Dirichlet(20 x baseline)), rebuild the index under each, and rerun the Experiment A plan (greedy, K = 10, spillover) and the Experiment B essential-services plan (cost-aware, Rs 250 crore). For each draw we record which towns and town-facility assignments are chosen.
+
+# In[31]:
+
+
+WVEC_BASE, MEAN_IS_BASE = WVEC.copy(), MEAN_IS
+w_base = np.array([W_NORM[p] for p in PILLARS])
+rng_w = np.random.default_rng(SEED + 7)
+W_ALT = {"flat Dirichlet(1)": rng_w.dirichlet(np.ones(len(PILLARS)), 200),
+         "centred Dirichlet(20 x base)": rng_w.dirichlet(20 * w_base, 200)}
+pillar_of = np.array([INDICATORS[c][0] for c in IND_NAMES])
+n_of = np.array([N_IN_PILLAR[p] for p in pillar_of])
+base_A_towns = set(SPILL_PLANS[("Greedy optimiser", True)].town)
+base_E_assign = set(PLAN250_ESS.town + "|" + PLAN250_ESS.action)
+WROWS, FREQ_A, FREQ_E = [], {}, {}
+try:
+    for fam, draws in W_ALT.items():
+        for w in draws:
+            wmap = dict(zip(PILLARS, w))
+            WVEC = np.array([wmap[p] for p in pillar_of]) / n_of
+            MEAN_IS = is_from_state(S0_STATE).mean()
+            _, pA = allocate("greedy", ACTIONS, K=10, spill=True)
+            _, pE = allocate("greedy_cost", ESSENTIAL, cost=LC, budget=250, spill=True)
+            tA, aE = set(pA.town), set(pE.town + "|" + pE.action)
+            for t in tA: FREQ_A[(fam, t)] = FREQ_A.get((fam, t), 0) + 1
+            for t in aE: FREQ_E[(fam, t)] = FREQ_E.get((fam, t), 0) + 1
+            WROWS.append({"family": fam, "A_jaccard_towns": jac(tA, base_A_towns), "A_base_towns_kept": len(tA & base_A_towns) / len(base_A_towns),
+                          "E_jaccard": jac(aE, base_E_assign), "E_core_both": CORE <= aE})
+finally:
+    WVEC, MEAN_IS = WVEC_BASE, MEAN_IS_BASE      # restore the baseline index
+assert np.allclose(is_from_state(S0_STATE), IS0)
+WROB = pd.DataFrame(WROWS)
+WROB_SUM = WROB.groupby("family").agg(A_median_jaccard=("A_jaccard_towns", "median"), A_mean_share_base_towns=("A_base_towns_kept", "mean"),
+                                      E_median_jaccard=("E_jaccard", "median"), E_share_core_kept=("E_core_both", "mean"))
+display(WROB_SUM.round(3))
+n_draw = {f: len(d) for f, d in W_ALT.items()}
+freq = lambda D, fam: pd.Series({k[1]: v / n_draw[fam] for k, v in D.items() if k[0] == fam}).sort_values(ascending=False)
+WFREQ_A = pd.DataFrame({fam: freq(FREQ_A, fam) for fam in W_ALT}).fillna(0).sort_values("flat Dirichlet(1)", ascending=False)
+WFREQ_E = pd.DataFrame({fam: freq(FREQ_E, fam) for fam in W_ALT}).fillna(0).sort_values("flat Dirichlet(1)", ascending=False)
+display(Markdown("**Share of weight draws in which each town is in the Experiment A plan**")); display(WFREQ_A.head(12).round(2))
+display(Markdown("**Share of weight draws in which each essential-service assignment is chosen**")); display(WFREQ_E.head(10).round(2))
+for fam in W_ALT:
+    print(f"{fam}: base Experiment A towns chosen in >=50% of draws: "
+          f"{', '.join(t for t in sorted(base_A_towns) if WFREQ_A.loc[t, fam] >= 0.5)}; "
+          f"Sancoale fire {WFREQ_E.loc['Sancoale|Fire station', fam]:.0%}, Curchorem-Cacora hospital {WFREQ_E.loc['Curchorem-Cacora|Hospital', fam]:.0%}")
+WROB_SUM.round(4).to_csv(OUT / "weight_robustness_plans.csv")
+pd.concat({"A_towns": WFREQ_A, "E_assignments": WFREQ_E}).round(4).to_csv(OUT / "weight_robustness_selection_freq.csv")
+
+# Figure 12: selection frequency under alternative weightings
+topA = WFREQ_A.head(6).iloc[::-1]
+topE = WFREQ_E.head(6).iloc[::-1]
+fig, axes = plt.subplots(1, 2, figsize=(COL2, 1.6), gridspec_kw={"wspace": 0.75})
+for ax, tab, title in [(axes[0], topA, "(a) Experiment A: towns in the ten-step plan"),
+                       (axes[1], topE, "(b) Health and fire plan: assignments")]:
+    y = np.arange(len(tab))
+    ax.barh(y + 0.19, tab["flat Dirichlet(1)"], height=0.36, color=NORTH, label="flat weights")
+    ax.barh(y - 0.19, tab["centred Dirichlet(20 x base)"], height=0.36, color=SOUTH, label="centred weights")
+    labels = [t.replace("|", ": ").replace("Fire station", "fire").replace("Hospital", "hospital").replace("Primary health centre", "PHC") for t in tab.index]
+    ax.set_yticks(y, labels, fontsize=7)
+    ax.set_xlim(0, 1); ax.set_xticks([0, 0.5, 1], ["0%", "50%", "100%"])
+    ax.axvline(0.5, color=GREY, lw=0.8, ls=":")
+    ax.set_title(title, fontsize=8, loc="left")
+    ax.spines[["top", "right"]].set_visible(False)
+axes[0].set_xlabel("share of 200 weight draws", fontsize=7); axes[1].set_xlabel("share of 200 weight draws", fontsize=7)
+axes[1].legend(fontsize=7, frameon=False, loc="upper center", bbox_to_anchor=(-0.45, -0.32), ncol=2)
+savefig(fig, "fig12_weight_robustness.png")
+plt.show()
+
+
 # ## 12. Export results
 
-# In[29]:
+# In[32]:
 
 
 R.round(2).to_csv(OUT / "infrascore_rankings.csv", index=False)
@@ -1816,7 +2062,7 @@ print(f"Total runtime: {time.time() - T0:.0f} s")
 # 
 # The cell below prints the headline numbers used in the report, so every figure quoted in the paper can be traced to this run.
 
-# In[30]:
+# In[33]:
 
 
 g10 = PLANS[("Greedy optimiser", 10)]
@@ -1833,7 +2079,7 @@ FACILITIES   {best_clf}: mean ROC-AUC {FAC_TAB[FAC_TAB.model == best_clf].ROC_AU
 POLICY K=10  pop-weighted gain: greedy {s10.loc['Greedy optimiser', 'pop_weighted_gain']:.2f} | largest-first {s10.loc['Largest towns first', 'pop_weighted_gain']:.2f} | lowest-first {s10.loc['Lowest score first', 'pop_weighted_gain']:.2f} | random {s10.loc['Random (mean)', 'pop_weighted_gain']:.2f}
 COSTED       budget {BUDGET:g} units: cost-aware greedy {COST_TAB.set_index('strategy').loc['Cost-aware greedy', 'pop_weighted_gain']:.2f} | ignores-cost {COST_TAB.set_index('strategy').loc['Greedy (ignores cost)', 'pop_weighted_gain']:.2f} | lowest-first {COST_TAB.set_index('strategy').loc['Lowest score first', 'pop_weighted_gain']:.2f} | random {COST_TAB.set_index('strategy').loc['Random', 'pop_weighted_gain']:.2f}
              wins in 200 cost scenarios vs: {', '.join(f'{k} {v:.0%}' for k, v in win.items())}
-EVIDENCE     plan assignments after 2011: exact {(CHK.match == 'exact').sum()} of {len(CHK)}, exact or related {CHK.corroborated.sum()} of {len(CHK)}; towns exact {len(exact_towns)} of {len(towns_plan)}, exact or related {len(any_towns)} of {len(towns_plan)}; random controls {ctrl_hits} of {len(eligible)} (Fisher p = {FISHER.pvalue:.2f})
+EVIDENCE     plan assignments after 2011: exact {(CHK.match == 'exact').sum()} of {len(CHK)}, exact or related {CHK.corroborated.sum()} of {len(CHK)}; towns exact {len(exact_towns)} of {len(towns_plan)}, exact or related {len(any_towns)} of {len(towns_plan)}; random controls exact {ctrl_hits} of {len(eligible)} (Fisher p = {FISHER.pvalue:.3f}), exact or related {ctrl_any} of {len(eligible)} (p = {FISHER_ANY.pvalue:.3f})
 COVERAGE     {analysed['Towns']} of {OFFICIAL['Towns']} towns ({analysed['Statutory towns']}/14 statutory, {analysed['Census towns']}/56 census towns); {analysed['Urban population']:,} of {OFFICIAL['Urban population']:,} urban residents ({analysed['Urban population'] / OFFICIAL['Urban population']:.2%}); Orgao {int(orgao.geonames_pop):,}
              leave-one-town-out: worst rank shift {JACK.max_rank_shift.max():.0f}, median {JACK.max_rank_shift.median():.0f}; small towns min Spearman {SMALL.spearman.min():.3f}
 CONTEMPORARY circuity {CIRC:.2f}; median km hospital 2011 {NOW.hosp_2011.median():.1f} -> now >=30 beds {NOW.hosp_now.median():.1f}, any inpatient {NOW.inpatient_now.median():.1f}; fire {NOW.fire_2011.median():.1f} -> {NOW.fire_now.median():.1f}; fire<=5km towns {(NOW.fire_2011 <= 5).sum()} -> {(NOW.fire_now <= 5).sum()}
@@ -1848,6 +2094,11 @@ INTERVALS    90% held-out coverage (random 5-fold x10 | taluka-out), overall / s
 SPILLOVER    K=10 greedy pop-weighted gain {K10i[(False, 'Greedy optimiser')]:.3f} (random {K10i[(False, 'Random (mean of 200)')]:.3f}, ratio {RATIO_NOSPILL:.2f}) -> {K10i[(True, 'Greedy optimiser')]:.3f} with spillover (random {K10i[(True, 'Random (mean of 200)')]:.3f}, ratio {RATIO_SPILL:.2f}); shared towns {', '.join(SHARED_TOWNS)}
 REAL COSTS   Rs 250 cr lifecycle: cost-aware {BUDGET_TAB[(BUDGET_TAB.budget_cr == 250) & (BUDGET_TAB.strategy == 'Cost-aware greedy')].pop_weighted_gain.iloc[0]:.2f} | cost-blind {BUDGET_TAB[(BUDGET_TAB.budget_cr == 250) & (BUDGET_TAB.strategy == 'Greedy (ignores cost)')].pop_weighted_gain.iloc[0]:.2f} | lowest-first {BUDGET_TAB[(BUDGET_TAB.budget_cr == 250) & (BUDGET_TAB.strategy == 'Lowest score first')].pop_weighted_gain.iloc[0]:.2f} | random {BUDGET_TAB[(BUDGET_TAB.budget_cr == 250) & (BUDGET_TAB.strategy.str.startswith('Random'))].pop_weighted_gain.iloc[0]:.2f}; MC wins {', '.join(f'{k} {v:.0%}' for k, v in WIN_REAL.items())}
              essential services: cost-aware {ESSENTIAL_TAB.loc['Cost-aware greedy', 'pop_weighted_gain']:.2f} | cost-blind {ESSENTIAL_TAB.loc['Greedy (ignores cost)', 'pop_weighted_gain']:.2f}; plan {', '.join(PLAN250_ESS.town + ' ' + PLAN250_ESS.action)}; from today: {', '.join(PLAN_NOW_ESS.town + ' ' + PLAN_NOW_ESS.action)}
+SPILL VALID  model vs census nearest-facility km: median Spearman {SPILL_VAL.spearman.median():.2f} (range {SPILL_VAL.spearman.min():.2f}-{SPILL_VAL.spearman.max():.2f}); upper bound in {np.average(SPILL_VAL.share_pred_ge_census, weights=SPILL_VAL.towns_without):.0%} of pairs
+BENEFITS     residents newly within 5 km (hospital / fire): {'; '.join(f"{k}: {int(v.hospital_residents_newly_within_5km):,} / {int(v.fire_residents_newly_within_5km):,}" for k, v in BENEFIT.iterrows())}
+SENSITIVITY  {'; '.join(f"{r.setting}: A {r.A_gain:.2f} (x{r.A_ratio_vs_random:.1f}, J={r.A_jaccard_towns:.2f}) B {r.B_gain:.2f} essJ={r.essential_jaccard:.2f}" if pd.notna(r.A_gain) else f"{r.setting}: B {r.B_gain:.2f} vs blind {r.B_cost_blind_gain:.2f} essJ={r.essential_jaccard:.2f}" for r in SENSITIVITY.itertuples())}
+WEIGHTS      plans under 400 alternative pillar weightings (flat | centred): A median Jaccard {WROB_SUM.loc['flat Dirichlet(1)', 'A_median_jaccard']:.2f} | {WROB_SUM.loc['centred Dirichlet(20 x base)', 'A_median_jaccard']:.2f}; Sancoale in A {WFREQ_A.loc['Sancoale', 'flat Dirichlet(1)']:.0%} | {WFREQ_A.loc['Sancoale', 'centred Dirichlet(20 x base)']:.0%}, Cuncolim {WFREQ_A.loc['Cuncolim', 'flat Dirichlet(1)']:.0%} | {WFREQ_A.loc['Cuncolim', 'centred Dirichlet(20 x base)']:.0%}; essential: Sancoale fire {WFREQ_E.loc['Sancoale|Fire station', 'flat Dirichlet(1)']:.0%} | {WFREQ_E.loc['Sancoale|Fire station', 'centred Dirichlet(20 x base)']:.0%}, Cuncolim fire {WFREQ_E.loc['Cuncolim|Fire station', 'flat Dirichlet(1)']:.0%} | {WFREQ_E.loc['Cuncolim|Fire station', 'centred Dirichlet(20 x base)']:.0%}, Curchorem-Cacora hospital {WFREQ_E.loc['Curchorem-Cacora|Hospital', 'flat Dirichlet(1)']:.0%} | {WFREQ_E.loc['Curchorem-Cacora|Hospital', 'centred Dirichlet(20 x base)']:.0%}
+NO SPILL     hall/library spillovers off, Rs 250 cr: cost-aware {NOSPILL_TAB.loc['Cost-aware greedy', 'pop_weighted_gain']:.2f} ({NOSPILL_TAB.loc['Cost-aware greedy', 'n_facilities']:.0f} facilities, {NOSPILL_TAB.loc['Cost-aware greedy', 'halls_libraries']:.0f} halls/libraries) | cost-blind {NOSPILL_TAB.loc['Greedy (ignores cost)', 'pop_weighted_gain']:.2f} | lowest-first {NOSPILL_TAB.loc['Lowest score first', 'pop_weighted_gain']:.2f} | random {NOSPILL_TAB.loc['Random (mean of 30)', 'pop_weighted_gain']:.2f}; MC wins {', '.join(f'{k} {v:.0%}' for k, v in WIN_NS.items())}; hall opex x10: {HALL10['Cost-aware greedy']:.2f} vs {HALL10['Greedy (ignores cost)']:.2f}
 VALIDATION   literacy rho {VAL.iloc[0].spearman_rho:.2f} (p={VAL.iloc[0].p:.3f}); partial (size-controlled) {VAL.iloc[0].partial_rho_ctrl_size:.2f} (p={VAL.iloc[0].p_partial:.3f})
 """)
 

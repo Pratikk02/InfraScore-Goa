@@ -1,0 +1,34 @@
+group,town,facility,query,engine,searched,coding
+plan,Cuncolim,Hospital,"""Cuncolim Goa hospital"" / ""Cuncolim Goa hospital health centre""",web search (standard),2026-11,related
+plan,Cuncolim,Fire station,"""Cuncolim Goa fire station""",web search (standard),2026-11,exact
+plan,Sancoale,Hospital,"""Sancoale Goa hospital"" / ""Sancoale Goa hospital health centre""",web search (standard),2026-11,related
+plan,Sancoale,Fire station,"""Sancoale Goa fire station""",web search (standard),2026-11,none
+plan,Curchorem-Cacora,Hospital,"""Curchorem-Cacora Goa hospital"" / ""Curchorem-Cacora Goa hospital health centre""",web search (standard),2026-11,exact
+plan,Usgao,Hospital,"""Usgao Goa hospital"" / ""Usgao Goa hospital health centre""",web search (standard),2026-11,none
+plan,Usgao,Fire station,"""Usgao Goa fire station""",web search (standard),2026-11,exact
+plan,Quepem,Hospital,"""Quepem Goa hospital"" / ""Quepem Goa hospital health centre""",web search (standard),2026-11,exact
+plan,Quepem,Fire station,"""Quepem Goa fire station""",web search (standard),2026-11,none
+plan,Sanquelim,Hospital,"""Sanquelim Goa hospital"" / ""Sanquelim Goa hospital health centre""",web search (standard),2026-11,related
+control,Jua,Hospital,"""Jua Goa hospital"" / ""Jua Goa hospital health centre""",web search (standard),2026-11,none
+control,Jua,Fire station,"""Jua Goa fire station""",web search (standard),2026-11,none
+control,Bandora,Hospital,"""Bandora Goa hospital"" / ""Bandora Goa hospital health centre""",web search (standard),2026-11,none
+control,Bandora,Fire station,"""Bandora Goa fire station""",web search (standard),2026-11,none
+control,Onda,Hospital,"""Onda Goa hospital"" / ""Onda Goa hospital health centre""",web search (standard),2026-11,none
+control,Onda,Fire station,"""Onda Goa fire station""",web search (standard),2026-11,none
+control,Xeldem,Hospital,"""Xeldem Goa hospital"" / ""Xeldem Goa hospital health centre""",web search (standard),2026-11,none
+control,Xeldem,Fire station,"""Xeldem Goa fire station""",web search (standard),2026-11,none
+control,Goa Velha,Hospital,"""Goa Velha Goa hospital"" / ""Goa Velha Goa hospital health centre""",web search (standard),2026-11,none
+control,Goa Velha,Fire station,"""Goa Velha Goa fire station""",web search (standard),2026-11,none
+control,Anjuna,Hospital,"""Anjuna Goa hospital"" / ""Anjuna Goa hospital health centre""",web search (standard),2026-11,none
+control,Anjuna,Fire station,"""Anjuna Goa fire station""",web search (standard),2026-11,none
+control,Nuvem,Hospital,"""Nuvem Goa hospital"" / ""Nuvem Goa hospital health centre""",web search (standard),2026-11,none
+control,Nuvem,Fire station,"""Nuvem Goa fire station""",web search (standard),2026-11,none
+control,Mandrem,Hospital,"""Mandrem Goa hospital"" / ""Mandrem Goa hospital health centre""",web search (standard),2026-11,none
+control,Mandrem,Fire station,"""Mandrem Goa fire station""",web search (standard),2026-11,none
+control,Benaulim,Hospital,"""Benaulim Goa hospital"" / ""Benaulim Goa hospital health centre""",web search (standard),2026-11,related
+control,Benaulim,Fire station,"""Benaulim Goa fire station""",web search (standard),2026-11,none
+control,Chicalim,Fire station,"""Chicalim Goa fire station""",web search (standard),2026-11,none
+control,Siolim,Hospital,"""Siolim Goa hospital"" / ""Siolim Goa hospital health centre""",web search (standard),2026-11,exact
+control,Siolim,Fire station,"""Siolim Goa fire station""",web search (standard),2026-11,none
+control,Sanguem,Hospital,"""Sanguem Goa hospital"" / ""Sanguem Goa hospital health centre""",web search (standard),2026-11,exact
+control,Sanguem,Fire station,"""Sanguem Goa fire station""",web search (standard),2026-11,exact

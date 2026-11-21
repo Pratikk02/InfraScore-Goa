@@ -34,7 +34,7 @@ with its outputs, and `infrascore_goa_final.py` is the same code as a script. Th
 | 11a | Coverage | 69 of 70 towns; Orgao record absent; leave-one-town-out test |
 | 11b | Map and contemporary proxies | GeoNames coordinates; census-estimated circuity; current hospitals and fire stations |
 | 11c | Do the intervals cover? | Held-out coverage (random and leave-one-taluka-out), Mondrian bands, Moran's I |
-| 11d | Spillovers and real costs | Closed-form spillover allocation; sourced capital + operating costs; 200 cost scenarios |
+| 11d | Spillovers and real costs | Closed-form spillover allocation; sourced capital + operating costs; 200 cost scenarios; 400 alternative weightings |
 
 ## Data (public)
 
@@ -43,6 +43,7 @@ with its outputs, and `infrascore_goa_final.py` is the same code as a script. Th
 | `data/raw/census2011_goa_towns/` | 69 Town Directory records | Census of India 2011 DCHB, machine-readable copy by IndiaWikiFiles (MIT) |
 | `data/raw/india_districts_census_2011.csv` | 640-district household tables | github.com/nishusharma1608/India-Census-2011-Analysis |
 | `data/raw/spatial/` | Town coordinates, Goa outline, contemporary hospitals and fire stations | GeoNames (CC BY 4.0), datta07/INDIAN-SHAPEFILES, Goa DHS and DFES records; see `SOURCES.md` |
+| `data/raw/evidence/` | Search log for the post-2011 corroboration (plan and control towns) | Queries, coding rule; see `README.md` there |
 | `data/raw/costs/` | Capital and operating costs by facility | Goa project records, Prinja et al. (2016), Goa Budget 2025-26; see `SOURCES.md` |
 
 ## Analytical coverage
@@ -63,8 +64,10 @@ than five places.
 | Flags | Conformal band: Cuncolim significantly under-served; Quepem and Sancoale review candidates |
 | Contemporary proxies | Partially updated index vs 2011: Spearman 0.987; median km to public inpatient care 4.8 |
 | Experiment A (10 equal interventions) | Greedy 0.76 vs random 0.19 (4.1x); with spillovers 1.10 vs 0.34 (3.3x) |
-| Experiment B (Rs 250 crore lifecycle) | Cost-aware 0.88 vs cost-blind 0.80; best in 97-100% of 200 cost scenarios |
-| Post-2011 records | Exact evidence for 4 of 6 plan towns vs 0 of 3 random controls (Fisher p = 0.12, not significant) |
+| Experiment B (Rs 250 crore lifecycle) | Cost-aware 0.86 vs cost-blind 0.72; best in 96-100% of 200 cost scenarios |
+| Weakest spillovers off | Hall and library spillovers switched off: cost-aware 0.83 vs cost-blind 0.69, still best in 96% of cost scenarios |
+| Weight robustness | Plans rebuilt under 400 alternative pillar weightings: Sancoale and Cuncolim chosen in 99-100%; Sancoale fire station in 96-100% |
+| Post-2011 records | Exact evidence for 4 of 6 plan towns vs 2 of 12 random controls (Fisher p = 0.057); exact or related 6 of 6 vs 3 of 12 (p = 0.005) |
 
 ## Data quality log
 
@@ -81,5 +84,5 @@ than five places.
 ## Limitations
 
 The index uses 2011 data; the contemporary update covers hospital and fire access only. Distances are census estimates or
-circuity-adjusted straight lines, not road-network travel times. Operating costs for colleges, stadiums, halls and libraries are
-assumptions. Statutory-town intervals rest on 14 observations. Post-2011 records are cited, not independently verified.
+circuity-adjusted straight lines, not road-network travel times. Operating costs for colleges, stadiums and libraries are
+budget averages, and the community-hall cost is an assumption. Statutory-town intervals rest on 14 observations. Post-2011 records are cited, not independently verified.

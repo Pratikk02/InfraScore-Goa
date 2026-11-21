@@ -1,0 +1,7 @@
+setting,A_gain,A_ratio_vs_random,A_jaccard_towns,B_gain,essential_jaccard,B_cost_blind_gain
+circuity 1.26,1.155,3.1624,1.0,0.8933,1.0,
+circuity 1.40,1.0995,3.3115,1.0,0.8631,1.0,
+circuity 1.60,1.0416,3.4845,0.8,0.7806,0.4286,
+"discount 5%, 10 yr",,,,0.7533,0.8,0.5529
+"discount 10%, 10 yr",,,,0.8801,0.6667,0.6672
+"discount 8%, 15 yr",,,,0.7736,0.8,0.7211
